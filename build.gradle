@@ -1,0 +1,48 @@
+plugins {
+    id 'idea'
+    id 'java'
+    id "com.github.johnrengelman.shadow" version "2.0.1"
+}
+
+group 'hexGraph'
+version '1.0-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    kafkaVersion = '1.0.0'
+    log4jVersion = '2.10.0'
+    jacksonDataformatVersion = '2.9.3'
+
+    jUnitVersion = '4.12'
+}
+
+dependencies {
+    implementation "org.apache.kafka:kafka_2.12:${kafkaVersion}"
+    implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonDataformatVersion}"
+
+    testImplementation "junit:junit:${jUnitVersion}"
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'nz.co.hexgraph.HexGraphApplication'
+    }
+}
+
+shadowJar {
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
+        resource = 'reference.conf'
+    }
+}
+
+task run(type: JavaExec) {
+    dependsOn 'shadowJar'
+    main '-jar'
+    args ['build/libs/hexGraph-1.0-SNAPSHOT-all.jar']
+}
