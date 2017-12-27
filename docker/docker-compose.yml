@@ -1,0 +1,9 @@
+# TODO: It does not support version 3.4 why!
+version: "2"
+services:
+  hexgraph:
+    image: "hexgraph" # image tag name
+    build:
+      context: .. # this specifies where to find the Dockerfile to build the image
+    ports:
+      - "5000:5000"

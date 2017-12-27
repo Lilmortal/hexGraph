@@ -32,9 +32,11 @@ dependencies {
     testImplementation "junit:junit:${jUnitVersion}"
 }
 
+String mainClass = 'nz.co.hexgraph.HexGraphApplication'
+
 jar {
     manifest {
-        attributes 'Main-Class': 'nz.co.hexgraph.HexGraphApplication'
+        attributes 'Main-Class': mainClass
     }
 }
 
@@ -45,7 +47,7 @@ shadowJar {
 }
 
 task run(type: JavaExec) {
-    dependsOn 'shadowJar'
-    main '-jar'
-    args ['build/libs/hexGraph-1.0-SNAPSHOT-all.jar']
+    dependsOn shadowJar
+    classpath = shadowJar.outputs.files
+    main = mainClass
 }
