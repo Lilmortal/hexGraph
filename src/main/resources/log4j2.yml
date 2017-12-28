@@ -17,7 +17,7 @@ Configutation:
         pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
   Loggers:
       Root:
-        level: debug
+        level: info
         AppenderRef:
           - ref: Console_Appender
       Logger:
