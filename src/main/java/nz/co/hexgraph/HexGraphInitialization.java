@@ -28,7 +28,6 @@ public class HexGraphInitialization {
     public void start() {
         Configuration configuration = Configuration.getInstance();
 
-        ZkClient
         String topic = configuration.getTopic();
         List<CameraConfigProducer> cameraConfigProducers = configuration.getCameraConfigProducers();
         List<CameraConfigConsumer> cameraConfigConsumers = configuration.getCameraConfigConsumers();
