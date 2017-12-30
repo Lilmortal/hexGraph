@@ -7,14 +7,20 @@ import nz.co.hexgraph.config.CameraConfigProducer;
 import nz.co.hexgraph.config.Configuration;
 import nz.co.hexgraph.consumers.Consumer;
 import nz.co.hexgraph.consumers.ConsumerPropertiesBuilder;
+import nz.co.hexgraph.partitioner.CameraPartitioner;
 import nz.co.hexgraph.producers.Producer;
 import nz.co.hexgraph.producers.ProducerPropertiesBuilder;
+import org.I0Itec.zkclient.ZkClient;
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.producer.Callback;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Properties;
+import java.util.*;
 
 public class HexGraphInitialization {
     public static final Logger log = LoggerFactory.getLogger(HexGraphInitialization.class);
@@ -22,35 +28,51 @@ public class HexGraphInitialization {
     public void start() {
         Configuration configuration = Configuration.getInstance();
 
+        ZkClient
         String topic = configuration.getTopic();
-        CameraConfigProducer cameraConfigProducer = configuration.getCameraConfigProducer();
-        CameraConfigConsumer cameraConfigConsumer = configuration.getCameraConfigConsumer();
+        List<CameraConfigProducer> cameraConfigProducers = configuration.getCameraConfigProducers();
+        List<CameraConfigConsumer> cameraConfigConsumers = configuration.getCameraConfigConsumers();
+        Map<String, String> partitionConfig = configuration.getPartitions();
 
-        Properties producerProperties = buildProducerProperties(cameraConfigProducer);
-        Producer cameraProducer = new CameraProducer(producerProperties);
+        // TODO: Come back in 1 year and see if lambda is more intuitive than for loops
+        cameraConfigProducers.stream().forEach(cameraConfigProducer -> {
+            Properties producerProperties = buildProducerProperties(cameraConfigProducer, partitionConfig);
+            Producer cameraProducer = new CameraProducer(producerProperties);
 
-        cameraProducer.send(topic, "test");
-        cameraProducer.send(topic, "LOLOLOL");
+            cameraProducer.send(topic, "test");
+            cameraProducer.send(topic, "LOLOLOL", (metadata, exception) ->
+                    log.info("TOPIC: " + metadata.topic() + " " + metadata.partition() + " " + metadata.offset()));
+        });
 
-        Properties consumerProperties = buildConsumerProperties(cameraConfigConsumer);
-        Consumer cameraConsumer = new CameraConsumer(consumerProperties);
+        cameraConfigConsumers.stream().forEach(cameraConfigConsumer -> {
+            Properties consumerProperties = buildConsumerProperties(cameraConfigConsumer);
+            Consumer cameraConsumer = new CameraConsumer(consumerProperties);
 
-        cameraConsumer.subscribe(topic);
+            cameraConsumer.subscribe(topic, new ConsumerRebalanceListener() {
+                @Override
+                public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+                    log.info(String.format("%s revoked by this consumer.", Arrays.toString(partitions.toArray())));
+                }
 
-        ConsumerRecords<String, String> records = cameraConsumer.poll(100);
-        for (ConsumerRecord<String, String> record : records) {
-            log.info(record.value());
-        }
+                @Override
+                public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
+                    log.info(String.format("%s assigned to this consumer.", Arrays.toString(partitions.toArray())));
+                }
+            });
 
-        cameraProducer.close();
-        cameraConsumer.close();
+            ConsumerRecords<String, String> records = cameraConsumer.poll(100);
+            for (ConsumerRecord<String, String> record : records) {
+                log.info(record.value());
+            }
+        });
     }
 
-    private Properties buildProducerProperties(CameraConfigProducer cameraConfigProducer) {
+    private Properties buildProducerProperties(CameraConfigProducer cameraConfigProducer, Map<String, String> partitionConfig) {
         ProducerPropertiesBuilder producerPropertiesBuilder = new ProducerPropertiesBuilder(cameraConfigProducer.getBootstrapServerConfig(),
                 cameraConfigProducer.getSerializerClassConfig(),
                 cameraConfigProducer.getValueSerializerClassConfig());
-        return producerPropertiesBuilder.build();
+
+        return producerPropertiesBuilder.setPartitionerClassConfig(CameraPartitioner.class.getCanonicalName()).setPartitions(partitionConfig).build();
     }
 
     private Properties buildConsumerProperties(CameraConfigConsumer cameraConfigConsumer) {

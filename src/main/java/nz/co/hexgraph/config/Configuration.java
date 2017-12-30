@@ -1,8 +1,12 @@
 package nz.co.hexgraph.config;
 
+import nz.co.hexgraph.HexGraphInitialization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * A POJO reading from config files.
@@ -10,13 +14,17 @@ import java.util.Properties;
  * a library called "snakeyml" and jackson... maybe do this later when I have time.
  */
 public class Configuration {
+    public static final Logger log = LoggerFactory.getLogger(Configuration.class);
+
     private static final String CONFIG_NAME = "config.properties";
 
     private String topic;
 
-    private CameraConfigProducer cameraConfigProducer;
+    private List<CameraConfigProducer> cameraConfigProducers = new ArrayList<>();
 
-    private CameraConfigConsumer cameraConfigConsumer;
+    private List<CameraConfigConsumer> cameraConfigConsumers = new ArrayList<>();
+
+    private Map<String, String> partitions = new HashMap<>();
 
     private Configuration() {
         Properties properties = new Properties();
@@ -26,20 +34,38 @@ public class Configuration {
             System.out.println(e);
         }
 
-        this.topic = properties.getProperty("topic");
+        topic = properties.getProperty("topic");
 
-        String cameraProducerBootstrapServerConfig = properties.getProperty("camera.producer.bootstrapServerConfig");
-        String cameraProducerSerializerClassConfig = properties.getProperty("camera.producer.serializerClassConfig");
-        String cameraProducerValueSerializerClassConfig = properties.getProperty("camera.producer.valueSerializerClassConfig");
-        this.cameraConfigProducer = new CameraConfigProducer(cameraProducerBootstrapServerConfig, cameraProducerSerializerClassConfig,
-                cameraProducerValueSerializerClassConfig);
+        int i = 0;
 
-        String cameraConsumerBootstrapServerConfig = properties.getProperty("camera.consumer.bootstrapServerConfig");
-        String cameraConsumerDeserializerClassConfig = properties.getProperty("camera.consumer.deserializerClassConfig");
-        String cameraConsumerValueDeserializerClassConfig = properties.getProperty("camera.consumer.valueDeserializerClassConfig");
-        String cameraConsumerGroupIdConfig = properties.getProperty("camera.consumer.groupIdConfig");
-        this.cameraConfigConsumer = new CameraConfigConsumer(cameraConsumerBootstrapServerConfig, cameraConsumerDeserializerClassConfig,
-                cameraConsumerValueDeserializerClassConfig, cameraConsumerGroupIdConfig);
+        while(properties.getProperty(String.format("camera.producer.%s.bootstrapServerConfig", i)) != null) {
+            String cameraProducerBootstrapServerConfig = properties.getProperty(String.format("camera.producer.%s.bootstrapServerConfig", i));
+            String cameraProducerSerializerClassConfig = properties.getProperty(String.format("camera.producer.%s.serializerClassConfig", i));
+            String cameraProducerValueSerializerClassConfig = properties.getProperty(String.format("camera.producer.%s.valueSerializerClassConfig", i));
+            CameraConfigProducer cameraConfigProducer = new CameraConfigProducer(cameraProducerBootstrapServerConfig, cameraProducerSerializerClassConfig,
+                    cameraProducerValueSerializerClassConfig);
+            cameraConfigProducers.add(cameraConfigProducer);
+            i++;
+        }
+
+        i = 0;
+        while(properties.getProperty(String.format("camera.consumer.%s.bootstrapServerConfig", i)) != null) {
+            String cameraConsumerBootstrapServerConfig = properties.getProperty(String.format("camera.consumer.%s.bootstrapServerConfig", i));
+            String cameraConsumerDeserializerClassConfig = properties.getProperty(String.format("camera.consumer.%s.deserializerClassConfig", i));
+            String cameraConsumerValueDeserializerClassConfig = properties.getProperty(String.format("camera.consumer.%s.valueDeserializerClassConfig", i));
+            String cameraConsumerGroupIdConfig = properties.getProperty(String.format("camera.consumer.%s.groupIdConfig", i));
+            CameraConfigConsumer cameraConfigConsumer = new CameraConfigConsumer(cameraConsumerBootstrapServerConfig, cameraConsumerDeserializerClassConfig,
+                    cameraConsumerValueDeserializerClassConfig, cameraConsumerGroupIdConfig);
+            cameraConfigConsumers.add(cameraConfigConsumer);
+            i++;
+        }
+
+        String partition1 = properties.getProperty("camera.partition.partition1");
+        partitions.put("partition.1", partition1);
+
+        String partition2 = properties.getProperty("camera.partition.partition2");
+        partitions.put("partition.2", partition2);
+
     }
 
     private static class SingletonHelper {
@@ -54,11 +80,15 @@ public class Configuration {
         return topic;
     }
 
-    public CameraConfigProducer getCameraConfigProducer() {
-        return cameraConfigProducer;
+    public List<CameraConfigProducer> getCameraConfigProducers() {
+        return cameraConfigProducers;
     }
 
-    public CameraConfigConsumer getCameraConfigConsumer() {
-        return cameraConfigConsumer;
+    public List<CameraConfigConsumer> getCameraConfigConsumers() {
+        return cameraConfigConsumers;
+    }
+
+    public Map<String, String> getPartitions() {
+        return partitions;
     }
 }

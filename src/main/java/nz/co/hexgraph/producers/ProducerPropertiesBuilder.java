@@ -2,6 +2,7 @@ package nz.co.hexgraph.producers;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 
+import java.util.Map;
 import java.util.Properties;
 
 public class ProducerPropertiesBuilder {
@@ -15,6 +16,16 @@ public class ProducerPropertiesBuilder {
 
     public ProducerPropertiesBuilder setClientIdConfig(String clientIdConfig) {
         properties.put(ProducerConfig.CLIENT_ID_CONFIG, clientIdConfig);
+        return this;
+    }
+
+    public ProducerPropertiesBuilder setPartitionerClassConfig(String partitionerClassConfig) {
+        properties.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, partitionerClassConfig);
+        return this;
+    }
+
+    public ProducerPropertiesBuilder setPartitions(Map<String, String> partitions) {
+        partitions.forEach((key, value) -> properties.put(key, value));
         return this;
     }
 

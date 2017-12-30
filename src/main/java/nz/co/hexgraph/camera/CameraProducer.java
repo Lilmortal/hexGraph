@@ -1,6 +1,7 @@
 package nz.co.hexgraph.camera;
 
 import nz.co.hexgraph.producers.Producer;
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
@@ -17,6 +18,12 @@ public class CameraProducer implements Producer {
     public void send(String topicName, String message) {
         ProducerRecord<String, String> producerRecord = new ProducerRecord(topicName, message);
         producer.send(producerRecord);
+    }
+
+    @Override
+    public void send(String topicName, String message, Callback callback) {
+        ProducerRecord<String, String> producerRecord = new ProducerRecord(topicName, message);
+        producer.send(producerRecord, callback);
     }
 
     @Override

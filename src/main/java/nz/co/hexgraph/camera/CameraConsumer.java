@@ -1,6 +1,7 @@
 package nz.co.hexgraph.camera;
 
 import nz.co.hexgraph.consumers.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
@@ -18,6 +19,11 @@ public class CameraConsumer implements Consumer {
     @Override
     public void subscribe(String topicName) {
         consumer.subscribe(Arrays.asList(topicName));
+    }
+
+    @Override
+    public void subscribe(String topicName, ConsumerRebalanceListener consumerRebalanceListener) {
+        consumer.subscribe(Arrays.asList(topicName), consumerRebalanceListener);
     }
 
     @Override
