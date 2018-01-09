@@ -2,13 +2,35 @@ package nz.co.hexgraph.consumers;
 
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.Deserializer;
 
-public interface Consumer {
-    void subscribe(String topicName);
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Properties;
 
-    void subscribe(String topicName, ConsumerRebalanceListener consumerRebalanceListener);
+public abstract class Consumer extends KafkaConsumer {
 
-    ConsumerRecords<String, String> poll(long timeout);
+    public Consumer(Map configs) {
+        super(configs);
+    }
 
-    void close();
+    public Consumer(Map configs, Deserializer keyDeserializer, Deserializer valueDeserializer) {
+        super(configs, keyDeserializer, valueDeserializer);
+    }
+
+    public Consumer(Properties properties) {
+        super(properties);
+    }
+
+    public Consumer(Properties properties, Deserializer keyDeserializer, Deserializer valueDeserializer) {
+        super(properties, keyDeserializer, valueDeserializer);
+    }
+
+    public void subscribe(String topic) {
+        super.subscribe(Arrays.asList(topic));
+    }
+
+    // TODO: Add some abstract methods here later on
 }

@@ -16,8 +16,8 @@ public class CameraPartitioner implements Partitioner {
     @Override
     public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {
         List<PartitionInfo> partitions = cluster.availablePartitionsForTopic(topic);
-        log.info("BB" + partitions.size());
-        partitions.stream().forEach(partition -> log.info("YY" + partition.partition()));
+//        log.info("BB" + partitions.size());
+//        partitions.stream().forEach(partition -> log.info("YY" + partition.partition()));
         return 0;
     }
 
@@ -30,7 +30,7 @@ public class CameraPartitioner implements Partitioner {
     public void configure(Map<String, ?> configs) {
         for (Map.Entry<String, ?> entry : configs.entrySet()) {
             if (entry.getKey().startsWith("partition.")) {
-                log.info("Partition stuff: " + entry.getKey() + " " + entry.getValue());
+//                log.info("Partition stuff: " + entry.getKey() + " " + entry.getValue());
             }
         }
     }

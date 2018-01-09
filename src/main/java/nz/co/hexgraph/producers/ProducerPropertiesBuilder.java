@@ -14,17 +14,17 @@ public class ProducerPropertiesBuilder {
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializerClassConfig);
     }
 
-    public ProducerPropertiesBuilder setClientIdConfig(String clientIdConfig) {
+    public ProducerPropertiesBuilder withClientIdConfig(String clientIdConfig) {
         properties.put(ProducerConfig.CLIENT_ID_CONFIG, clientIdConfig);
         return this;
     }
 
-    public ProducerPropertiesBuilder setPartitionerClassConfig(String partitionerClassConfig) {
+    public ProducerPropertiesBuilder withPartitionerClassConfig(String partitionerClassConfig) {
         properties.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, partitionerClassConfig);
         return this;
     }
 
-    public ProducerPropertiesBuilder setPartitions(Map<String, String> partitions) {
+    public ProducerPropertiesBuilder withPartitions(Map<String, String> partitions) {
         partitions.forEach((key, value) -> properties.put(key, value));
         return this;
     }

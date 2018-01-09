@@ -15,6 +15,11 @@ public class ConsumerPropertiesBuilder {
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, groupIdConfig);
     }
 
+    public ConsumerPropertiesBuilder withAutoOffsetResetConfig(String autoOffsetResetConfig) {
+        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetResetConfig);
+        return this;
+    }
+
     public Properties build() {
         return properties;
     }

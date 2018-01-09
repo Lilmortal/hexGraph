@@ -10,12 +10,9 @@ import nz.co.hexgraph.consumers.ConsumerPropertiesBuilder;
 import nz.co.hexgraph.partitioner.CameraPartitioner;
 import nz.co.hexgraph.producers.Producer;
 import nz.co.hexgraph.producers.ProducerPropertiesBuilder;
-import org.I0Itec.zkclient.ZkClient;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.producer.Callback;
-import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,35 +30,42 @@ public class HexGraphInitialization {
         List<CameraConfigConsumer> cameraConfigConsumers = configuration.getCameraConfigConsumers();
         Map<String, String> partitionConfig = configuration.getPartitions();
 
-        // TODO: Come back in 1 year and see if lambda is more intuitive than for loops
-        cameraConfigProducers.stream().forEach(cameraConfigProducer -> {
-            Properties producerProperties = buildProducerProperties(cameraConfigProducer, partitionConfig);
-            Producer cameraProducer = new CameraProducer(producerProperties);
+//        // TODO: Come back in 1 year and see if lambda is more intuitive than for loops
+//        cameraConfigProducers.stream().forEach(cameraConfigProducer -> {
+//            Properties producerProperties = buildProducerProperties(cameraConfigProducer, partitionConfig);
+//            Producer cameraProducer = new CameraProducer(producerProperties);
+//
+//            cameraProducer.send(topic, "test");
+//            cameraProducer.send(topic, "LOLOLOL", (metadata, exception) ->
+//                    log.info("TOPIC: " + metadata.topic() + " " + metadata.partition() + " " + metadata.offset()));
+//        });
 
-            cameraProducer.send(topic, "test");
-            cameraProducer.send(topic, "LOLOLOL", (metadata, exception) ->
-                    log.info("TOPIC: " + metadata.topic() + " " + metadata.partition() + " " + metadata.offset()));
-        });
 
         cameraConfigConsumers.stream().forEach(cameraConfigConsumer -> {
             Properties consumerProperties = buildConsumerProperties(cameraConfigConsumer);
             Consumer cameraConsumer = new CameraConsumer(consumerProperties);
+            try {
+                while (true) {
+                    cameraConsumer.subscribe(topic/*, new ConsumerRebalanceListener() {
+                    @Override
+                    public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+                        log.info(String.format("%s revoked by this consumer.", Arrays.toString(partitions.toArray())));
+                    }
 
-            cameraConsumer.subscribe(topic, new ConsumerRebalanceListener() {
-                @Override
-                public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
-                    log.info(String.format("%s revoked by this consumer.", Arrays.toString(partitions.toArray())));
+                    @Override
+                    public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
+                        log.info(String.format("%s assigned to this consumer.", Arrays.toString(partitions.toArray())));
+                    }
+                }*/);
+
+                    ConsumerRecords<String, String> records = cameraConsumer.poll(100);
+                    for (ConsumerRecord<String, String> record : records) {
+                        log.info("Value: " + record.value());
+                    }
+//                cameraConsumer.commitAsync();
                 }
-
-                @Override
-                public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
-                    log.info(String.format("%s assigned to this consumer.", Arrays.toString(partitions.toArray())));
-                }
-            });
-
-            ConsumerRecords<String, String> records = cameraConsumer.poll(100);
-            for (ConsumerRecord<String, String> record : records) {
-                log.info(record.value());
+            } finally {
+                cameraConsumer.close();
             }
         });
     }
@@ -71,13 +75,13 @@ public class HexGraphInitialization {
                 cameraConfigProducer.getSerializerClassConfig(),
                 cameraConfigProducer.getValueSerializerClassConfig());
 
-        return producerPropertiesBuilder.setPartitionerClassConfig(CameraPartitioner.class.getCanonicalName()).setPartitions(partitionConfig).build();
+        return producerPropertiesBuilder.withPartitionerClassConfig(CameraPartitioner.class.getCanonicalName()).withPartitions(partitionConfig).build();
     }
 
     private Properties buildConsumerProperties(CameraConfigConsumer cameraConfigConsumer) {
         ConsumerPropertiesBuilder consumerPropertiesBuilder = new ConsumerPropertiesBuilder(cameraConfigConsumer.getBootstrapServerConfig(),
                 cameraConfigConsumer.getDeserializerClassConfig(), cameraConfigConsumer.getValueDeserializerClassConfig(),
-                cameraConfigConsumer.getGroupIdConfig());
+                cameraConfigConsumer.getGroupIdConfig()).withAutoOffsetResetConfig(cameraConfigConsumer.getAutoOffsetResetConfig());
         return consumerPropertiesBuilder.build();
     }
 }

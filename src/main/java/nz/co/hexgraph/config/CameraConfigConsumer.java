@@ -9,11 +9,15 @@ public class CameraConfigConsumer {
 
     private String groupIdConfig;
 
-    public CameraConfigConsumer(String bootstrapServerConfig, String deserializerClassConfig, String valueDeserializerClassConfig, String groupIdConfig) {
+    private String autoOffsetResetConfig;
+
+    public CameraConfigConsumer(String bootstrapServerConfig, String deserializerClassConfig,
+                                String valueDeserializerClassConfig, String groupIdConfig, String autoOffsetResetConfig) {
         this.bootstrapServerConfig = bootstrapServerConfig;
         this.deserializerClassConfig = deserializerClassConfig;
         this.valueDeserializerClassConfig = valueDeserializerClassConfig;
         this.groupIdConfig = groupIdConfig;
+        this.autoOffsetResetConfig = autoOffsetResetConfig;
     }
 
     public String getBootstrapServerConfig() {
@@ -30,5 +34,9 @@ public class CameraConfigConsumer {
 
     public String getGroupIdConfig() {
         return groupIdConfig;
+    }
+
+    public String getAutoOffsetResetConfig() {
+        return autoOffsetResetConfig;
     }
 }

@@ -38,7 +38,7 @@ public class Configuration {
 
         int i = 0;
 
-        while(properties.getProperty(String.format("camera.producer.%s.bootstrapServerConfig", i)) != null) {
+        while (properties.getProperty(String.format("camera.producer.%s.bootstrapServerConfig", i)) != null) {
             String cameraProducerBootstrapServerConfig = properties.getProperty(String.format("camera.producer.%s.bootstrapServerConfig", i));
             String cameraProducerSerializerClassConfig = properties.getProperty(String.format("camera.producer.%s.serializerClassConfig", i));
             String cameraProducerValueSerializerClassConfig = properties.getProperty(String.format("camera.producer.%s.valueSerializerClassConfig", i));
@@ -49,13 +49,15 @@ public class Configuration {
         }
 
         i = 0;
-        while(properties.getProperty(String.format("camera.consumer.%s.bootstrapServerConfig", i)) != null) {
+        while (properties.getProperty(String.format("camera.consumer.%s.bootstrapServerConfig", i)) != null) {
             String cameraConsumerBootstrapServerConfig = properties.getProperty(String.format("camera.consumer.%s.bootstrapServerConfig", i));
             String cameraConsumerDeserializerClassConfig = properties.getProperty(String.format("camera.consumer.%s.deserializerClassConfig", i));
             String cameraConsumerValueDeserializerClassConfig = properties.getProperty(String.format("camera.consumer.%s.valueDeserializerClassConfig", i));
             String cameraConsumerGroupIdConfig = properties.getProperty(String.format("camera.consumer.%s.groupIdConfig", i));
-            CameraConfigConsumer cameraConfigConsumer = new CameraConfigConsumer(cameraConsumerBootstrapServerConfig, cameraConsumerDeserializerClassConfig,
-                    cameraConsumerValueDeserializerClassConfig, cameraConsumerGroupIdConfig);
+            String cameraConsumerAutoOffsetResetConfig = properties.getProperty(String.format("camera.consumer.%s.autoOffsetResetConfig", i));
+            CameraConfigConsumer cameraConfigConsumer = new CameraConfigConsumer(cameraConsumerBootstrapServerConfig,
+                    cameraConsumerDeserializerClassConfig, cameraConsumerValueDeserializerClassConfig,
+                    cameraConsumerGroupIdConfig, cameraConsumerAutoOffsetResetConfig);
             cameraConfigConsumers.add(cameraConfigConsumer);
             i++;
         }
