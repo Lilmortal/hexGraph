@@ -39,10 +39,6 @@ public class PixelActor extends AbstractActor {
         }
     }
 
-    private void getMessage(int from, int to) {
-        LOG.info(from + " " + to);
-    }
-
     @Override
     public Receive createReceive() {
         return receiveBuilder().match(UpdateImage.class, r -> {
@@ -51,7 +47,14 @@ public class PixelActor extends AbstractActor {
             this.from = r.from;
             this.to = r.to;
 
-            getMessage(from, to);
+            // TODO: Have a message that get red, blue, green
+            // Here, it's pixel[fromX][fromY] to pixel[toX][toY], create a new class with X and Y
+            int rgb = image.getRGB(0, 0);
+            int red = (rgb >> 16) & 0x000000FF;
+            int green = (rgb >>8 ) & 0x000000FF;
+            int blue = (rgb) & 0x000000FF;
+
+            LOG.info(red + " " + green + " " + blue);
         }).build();
     }
 }

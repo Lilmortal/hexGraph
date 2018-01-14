@@ -99,15 +99,6 @@ public class HexGraphInitialization {
                         try {
                             BufferedImage image = reader.getImage(kafkaValue.getPayload());
 
-                            int[] pixels = image.getRaster().getPixel(0, 0, new int[3]);
-
-//                            int alpha = (pixel >> 24) & 0xff;
-//                            int red = (pixel >> 16) & 0xff;
-//                            int green = (pixel >> 8) & 0xff;
-//                            int blue = (pixel) & 0xff;
-
-                            log.info(pixels[0] + " " + pixels[1] + " " + pixels[2]);
-
                             imageActor.tell(new ImageActor.UpdateImage(image), imageActor);
                         } catch (IOException e) {
                             log.info(e.getMessage());
