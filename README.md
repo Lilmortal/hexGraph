@@ -10,3 +10,6 @@ In terms of the UI side, I was thinking of working with Vue, but I decided I am 
 In terms of deployment, I am not skilled at the devops side, hence I am thinking of having a docker image for my zookeeper, 2 images for my 2 brokers, and potentially using Kubernetes to handle them for learning purposes too? I will also need to think about how to automate the deployment process to AWS EC2, S3 and Cloudfront, via Ansible and/or AWS Cloudformation.
 
 I am hoping I can finish this project in 2 months max, HOPEFULLY! 
+
+
+# Change kafka connect from standalone to distributed

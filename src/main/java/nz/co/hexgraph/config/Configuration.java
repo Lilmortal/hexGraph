@@ -1,6 +1,5 @@
 package nz.co.hexgraph.config;
 
-import nz.co.hexgraph.HexGraphInitialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +19,8 @@ public class Configuration {
 
     private String topic;
 
+    private FileType fileType;
+
     private List<CameraConfigProducer> cameraConfigProducers = new ArrayList<>();
 
     private List<CameraConfigConsumer> cameraConfigConsumers = new ArrayList<>();
@@ -34,10 +35,11 @@ public class Configuration {
             System.out.println(e);
         }
 
+
         topic = properties.getProperty("topic");
+        fileType = FileType.valueOf(properties.getProperty("fileType").toUpperCase());
 
         int i = 0;
-
         while (properties.getProperty(String.format("camera.producer.%s.bootstrapServerConfig", i)) != null) {
             String cameraProducerBootstrapServerConfig = properties.getProperty(String.format("camera.producer.%s.bootstrapServerConfig", i));
             String cameraProducerSerializerClassConfig = properties.getProperty(String.format("camera.producer.%s.serializerClassConfig", i));
@@ -80,6 +82,10 @@ public class Configuration {
 
     public String getTopic() {
         return topic;
+    }
+
+    public FileType getFileType() {
+        return fileType;
     }
 
     public List<CameraConfigProducer> getCameraConfigProducers() {
