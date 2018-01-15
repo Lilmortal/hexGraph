@@ -33,14 +33,14 @@ public class ImageActor extends AbstractActor {
             int processors = Runtime.getRuntime().availableProcessors();
             int numberOfPixels = image.getWidth() * image.getHeight();
 
-            LOG.info("Processors: " + processors + " " + numberOfPixels);
+            int numberOfPixelsPerProcessor = numberOfPixels / processors;
+
             // TODO: Pass X and Y despite numberOfPixels
-            int pos = 10;
-            for (int i = 0; i < 3; i++) {
+            for (int i = 1; i <= processors; i++) {
+                int pos = numberOfPixelsPerProcessor * i;
                 ActorRef pixelActor = getContext().actorOf(PixelActor.props());
                 pixelActor.tell(new PixelActor.UpdateImage(image), getSelf());
-                pixelActor.tell(new PixelActor.UpdatePosition(0, pos), getSelf());
-                pos += 10;
+                pixelActor.tell(new PixelActor.UpdatePosition(pos - numberOfPixelsPerProcessor, pos), getSelf());
             }
         }).build();
     }

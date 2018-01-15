@@ -49,7 +49,12 @@ public class PixelActor extends AbstractActor {
 
             // TODO: Have a message that get red, blue, green
             // Here, it's pixel[fromX][fromY] to pixel[toX][toY], create a new class with X and Y
-            int rgb = image.getRGB(0, 0);
+            int rgb = image.getRGB(from, to);
+
+            int width = image.getWidth();
+            int height = image.getHeight();
+            image.
+            // TODO: split 2d array into 4 1d arrays
             int red = (rgb >> 16) & 0x000000FF;
             int green = (rgb >>8 ) & 0x000000FF;
             int blue = (rgb) & 0x000000FF;
