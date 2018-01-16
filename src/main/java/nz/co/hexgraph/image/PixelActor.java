@@ -47,19 +47,36 @@ public class PixelActor extends AbstractActor {
             this.from = r.from;
             this.to = r.to;
 
-            // TODO: Have a message that get red, blue, green
-            // Here, it's pixel[fromX][fromY] to pixel[toX][toY], create a new class with X and Y
-            int rgb = image.getRGB(from, to);
-
             int width = image.getWidth();
-            int height = image.getHeight();
-            image.
-            // TODO: split 2d array into 4 1d arrays
-            int red = (rgb >> 16) & 0x000000FF;
-            int green = (rgb >>8 ) & 0x000000FF;
-            int blue = (rgb) & 0x000000FF;
 
-            LOG.info(red + " " + green + " " + blue);
+            for (int i = from; i < to; i++) {
+                int x, y;
+
+                if (i < width) {
+                    x = i;
+                    y = 0;
+                } else {
+                    y = i / width;
+                    x = i % width;
+                }
+
+                // TODO: Have a message that get red, blue, green
+                // Here, it's pixel[fromX][fromY] to pixel[toX][toY], create a new class with X and Y
+                int rgb = 0;
+                try {
+                    rgb = image.getRGB(x, y);
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    LOG.error(e.getMessage());
+                    LOG.error("Array out of bounds with x:" + x + ", y:" + y);
+                }
+                // TODO: split 2d array into 4 1d arrays
+                int red = (rgb >> 16) & 0x000000FF;
+                int green = (rgb >>8 ) & 0x000000FF;
+                int blue = (rgb) & 0x000000FF;
+
+//                LOG.info(red + " " + green + " " + blue);
+            }
+
         }).build();
     }
 }

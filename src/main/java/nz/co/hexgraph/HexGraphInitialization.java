@@ -23,7 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.ZoneId;
 import java.util.*;
 
 public class HexGraphInitialization {
@@ -97,6 +101,8 @@ public class HexGraphInitialization {
                         KafkaValue kafkaValue = gson.fromJson(record.value(), KafkaValue.class);
 
                         try {
+                            BasicFileAttributes attr = Files.readAttributes(new File(kafkaValue.getPayload()).toPath(), BasicFileAttributes.class);
+                            log.info(String.valueOf(attr.creationTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
                             BufferedImage image = reader.getImage(kafkaValue.getPayload());
 
                             imageActor.tell(new ImageActor.UpdateImage(image), imageActor);
