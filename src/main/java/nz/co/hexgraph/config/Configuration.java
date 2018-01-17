@@ -24,7 +24,7 @@ public class Configuration {
 
     private static final String TOPIC_HEX_CONFIG_NAME = "topic.hex";
 
-    private static final String FILE_TYPE_CONFIG_NAME = "file.type";
+    private static final String IMAGE_FILE_TYPE_CONFIG_NAME = "image.file.type";
 
     private static final String HEX_PRODUCER_BOOTSTRAP_SERVER_CONFIG_NAME = "hex.producer.%s.bootstrapServerConfig";
 
@@ -48,7 +48,7 @@ public class Configuration {
 
     private String topicHex;
 
-    private FileType fileType;
+    private FileType imageFileType;
 
     private List<ProducerConfig> hexProducerConfigs = new ArrayList<>();
 
@@ -66,7 +66,7 @@ public class Configuration {
 
         topicImage = properties.getProperty(TOPIC_IMAGE_CONFIG_NAME);
         topicHex = properties.getProperty(TOPIC_HEX_CONFIG_NAME);
-        fileType = FileType.valueOf(properties.getProperty(FILE_TYPE_CONFIG_NAME).toUpperCase());
+        imageFileType = FileType.valueOf(properties.getProperty(IMAGE_FILE_TYPE_CONFIG_NAME).toUpperCase());
 
         int i = 0;
         while (properties.getProperty(String.format(HEX_PRODUCER_BOOTSTRAP_SERVER_CONFIG_NAME, i)) != null) {
@@ -112,8 +112,8 @@ public class Configuration {
         return topicHex;
     }
 
-    public FileType getFileType() {
-        return fileType;
+    public FileType getImageFileType() {
+        return imageFileType;
     }
 
     public List<ProducerConfig> getHexProducerConfigs() {

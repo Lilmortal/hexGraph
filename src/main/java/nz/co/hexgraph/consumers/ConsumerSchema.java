@@ -1,11 +1,11 @@
-package nz.co.hexgraph.reader;
+package nz.co.hexgraph.consumers;
 
-public class KafkaSchema {
+public class ConsumerSchema {
     private String type;
 
     private boolean optional;
 
-    public KafkaSchema(String type, boolean optional) {
+    public ConsumerSchema(String type, boolean optional) {
         this.type = type;
         this.optional = optional;
     }

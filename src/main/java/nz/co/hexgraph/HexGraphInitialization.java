@@ -10,7 +10,7 @@ import nz.co.hexgraph.config.Configuration;
 import nz.co.hexgraph.consumers.Consumer;
 import nz.co.hexgraph.image.ImageActor;
 import nz.co.hexgraph.image.ImageConsumerBuilder;
-import nz.co.hexgraph.reader.KafkaValue;
+import nz.co.hexgraph.consumers.ConsumerValue;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.slf4j.Logger;
@@ -44,9 +44,9 @@ public class HexGraphInitialization {
 
                     ConsumerRecords<String, String> records = imageConsumer.poll(imageConsumerPollTimeout);
                     for (ConsumerRecord<String, String> record : records) {
-                        KafkaValue kafkaValue = new ObjectMapper().readValue(record.value(), KafkaValue.class);
+                        ConsumerValue consumerValue = new ObjectMapper().readValue(record.value(), ConsumerValue.class);
 
-                        imageActor.tell(new ImageActor.UpdateImagePath(kafkaValue.getPayload()), imageActor);
+                        imageActor.tell(new ImageActor.UpdateImagePath(consumerValue.getPayload()), imageActor);
                     }
 //                cameraConsumer.commitAsync();
                 }

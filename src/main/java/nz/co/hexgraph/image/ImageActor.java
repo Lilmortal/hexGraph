@@ -39,7 +39,7 @@ public class ImageActor extends AbstractActor {
             this.imagePath = r.imagePath;
 
             Configuration configuration = Configuration.getInstance();
-            FileType fileType = configuration.getFileType();
+            FileType fileType = configuration.getImageFileType();
 
             Reader reader = null;
             switch (fileType) {

@@ -124,7 +124,7 @@ public class PixelActor extends AbstractActor {
         }).build();
     }
 
-    private Properties buildProducerProperties(ProducerConfig producerConfig, Map<String) {
+    private Properties buildProducerProperties(ProducerConfig producerConfig) {
         ProducerPropertiesBuilder producerPropertiesBuilder = new ProducerPropertiesBuilder(producerConfig.getBootstrapServerConfig(),
                 producerConfig.getSerializerClassConfig(),
                 producerConfig.getValueSerializerClassConfig());
