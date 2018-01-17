@@ -70,6 +70,8 @@ public class ImageActor extends AbstractActor {
                 pixelActor.tell(new PixelActor.UpdateImage(image), getSelf());
                 pixelActor.tell(new PixelActor.UpdatePosition(pos - numberOfPixelsPerProcessor, pos), getSelf());
             }
+        }).matchEquals(PixelActor.Message.TOPIC_MESSAGE_SENT, r -> {
+            LOG.info("Message sent to topic.");
         }).build();
     }
 }
