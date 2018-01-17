@@ -1,11 +1,27 @@
 package nz.co.hexgraph.producers;
 
-import org.apache.kafka.clients.producer.Callback;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.common.serialization.Serializer;
 
-public interface Producer {
-    void send(String topicName, String message);
+import java.util.Map;
+import java.util.Properties;
 
-    void send(String topicName, String message, Callback callback);
+public abstract class Producer extends KafkaProducer {
 
-    void close();
+    public Producer(Map configs) {
+        super(configs);
+    }
+
+    public Producer(Map configs, Serializer keySerializer, Serializer valueSerializer) {
+        super(configs, keySerializer, valueSerializer);
+    }
+
+    public Producer(Properties properties) {
+        super(properties);
+    }
+
+    public Producer(Properties properties, Serializer keySerializer, Serializer valueSerializer) {
+        super(properties, keySerializer, valueSerializer);
+    }
 }
+

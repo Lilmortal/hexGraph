@@ -13,11 +13,19 @@ import java.util.*;
  * a library called "snakeyml" and jackson... maybe do this later when I have time.
  */
 public class Configuration {
-    public static final Logger log = LoggerFactory.getLogger(Configuration.class);
+    public static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
     private static final String CONFIG_NAME = "config.properties";
 
-    private String topic;
+    private static final String TOPIC_IMAGE_CONFIG_NAME = "topic.image";
+
+    private static final String TOPIC_HEX_CONFIG_NAME = "topic.hex";
+
+    private static final String FILE_TYPE_CONFIG_NAME = "file.type";
+
+    private String topicImage;
+
+    private String topicHex;
 
     private FileType fileType;
 
@@ -36,8 +44,9 @@ public class Configuration {
         }
 
 
-        topic = properties.getProperty("topic");
-        fileType = FileType.valueOf(properties.getProperty("fileType").toUpperCase());
+        topicImage = properties.getProperty(TOPIC_IMAGE_CONFIG_NAME);
+        topicHex = properties.getProperty(TOPIC_HEX_CONFIG_NAME);
+        fileType = FileType.valueOf(properties.getProperty(FILE_TYPE_CONFIG_NAME).toUpperCase());
 
         int i = 0;
         while (properties.getProperty(String.format("camera.producer.%s.bootstrapServerConfig", i)) != null) {
@@ -80,8 +89,12 @@ public class Configuration {
         return SingletonHelper.INSTANCE;
     }
 
-    public String getTopic() {
-        return topic;
+    public String getTopicImage() {
+        return topicImage;
+    }
+
+    public String getTopicHex() {
+        return topicHex;
     }
 
     public FileType getFileType() {

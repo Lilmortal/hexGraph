@@ -1,11 +1,19 @@
 package nz.co.hexgraph.reader;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 public class S3Reader implements Reader {
+
     @Override
-    public BufferedImage getImage(String filePath) throws IOException {
+    public BufferedImage getImage(File file) throws IOException {
+        return null;
+    }
+
+    @Override
+    public LocalDateTime getCreationDate(File file) throws IOException {
         return null;
     }
 }
