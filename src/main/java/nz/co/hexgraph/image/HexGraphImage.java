@@ -19,4 +19,12 @@ public class HexGraphImage {
     public LocalDateTime getCreationDate() {
         return creationDate;
     }
+
+    @Override
+    public String toString() {
+        return "HexGraphImage{" +
+                "imagePath='" + imagePath + '\'' +
+                ", creationDate=" + creationDate +
+                '}';
+    }
 }

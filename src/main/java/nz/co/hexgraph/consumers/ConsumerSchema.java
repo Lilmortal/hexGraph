@@ -12,4 +12,12 @@ public class ConsumerSchema {
     public boolean isOptional() {
         return optional;
     }
+
+    @Override
+    public String toString() {
+        return "ConsumerSchema{" +
+                "type='" + type + '\'' +
+                ", optional=" + optional +
+                '}';
+    }
 }

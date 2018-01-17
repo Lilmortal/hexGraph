@@ -24,4 +24,13 @@ public class ProducerConfig {
     public String getValueSerializerClassConfig() {
         return valueSerializerClassConfig;
     }
+
+    @Override
+    public String toString() {
+        return "ProducerConfig{" +
+                "bootstrapServerConfig='" + bootstrapServerConfig + '\'' +
+                ", serializerClassConfig='" + serializerClassConfig + '\'' +
+                ", valueSerializerClassConfig='" + valueSerializerClassConfig + '\'' +
+                '}';
+    }
 }

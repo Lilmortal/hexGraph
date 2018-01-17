@@ -17,4 +17,12 @@ public class ImagePixel {
     public String getHex() {
         return hex;
     }
+
+    @Override
+    public String toString() {
+        return "ImagePixel{" +
+                "hexGraphImage=" + hexGraphImage +
+                ", hex='" + hex + '\'' +
+                '}';
+    }
 }

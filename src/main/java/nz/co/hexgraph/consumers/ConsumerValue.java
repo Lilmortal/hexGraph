@@ -14,4 +14,12 @@ public class ConsumerValue {
     public String getPayload() {
         return payload;
     }
+
+    @Override
+    public String toString() {
+        return "ConsumerValue{" +
+                "schema=" + schema +
+                ", payload='" + payload + '\'' +
+                '}';
+    }
 }

@@ -39,4 +39,15 @@ public class ConsumerConfig {
     public String getAutoOffsetResetConfig() {
         return autoOffsetResetConfig;
     }
+
+    @Override
+    public String toString() {
+        return "ConsumerConfig{" +
+                "bootstrapServerConfig='" + bootstrapServerConfig + '\'' +
+                ", deserializerClassConfig='" + deserializerClassConfig + '\'' +
+                ", valueDeserializerClassConfig='" + valueDeserializerClassConfig + '\'' +
+                ", groupIdConfig='" + groupIdConfig + '\'' +
+                ", autoOffsetResetConfig='" + autoOffsetResetConfig + '\'' +
+                '}';
+    }
 }
