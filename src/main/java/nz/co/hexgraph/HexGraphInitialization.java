@@ -2,64 +2,63 @@ package nz.co.hexgraph;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import com.google.gson.Gson;
-import nz.co.hexgraph.camera.CameraConsumer;
-import nz.co.hexgraph.config.CameraConfigConsumer;
-import nz.co.hexgraph.config.CameraConfigProducer;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import nz.co.hexgraph.consumers.ConsumerConfig;
 import nz.co.hexgraph.config.Configuration;
 import nz.co.hexgraph.consumers.Consumer;
-import nz.co.hexgraph.consumers.ConsumerPropertiesBuilder;
 import nz.co.hexgraph.image.ImageActor;
+import nz.co.hexgraph.image.ImageConsumerBuilder;
 import nz.co.hexgraph.reader.KafkaValue;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
 
 public class HexGraphInitialization {
-    public static final Logger log = LoggerFactory.getLogger(HexGraphInitialization.class);
+    public static final Logger LOG = LoggerFactory.getLogger(HexGraphInitialization.class);
 
     public void start() {
         Configuration configuration = Configuration.getInstance();
 
-        String topic = configuration.getTopicImage();
-        List<CameraConfigConsumer> cameraConfigConsumers = configuration.getCameraConfigConsumers();
+        String topicImage = configuration.getTopicImage();
+        List<ConsumerConfig> imageConsumerConfigs = configuration.getImageConsumerConfigs();
+        int imageConsumerPollTimeout = configuration.getImageConsumerPollTimeout();
+
+        ImageConsumerBuilder imageConsumerBuilder = new ImageConsumerBuilder();
+        List<Consumer> imageConsumers = imageConsumerBuilder.build(imageConsumerConfigs);
 
         ActorSystem system = ActorSystem.create("hexGraph");
 
         int consumerId = 0;
-        for (CameraConfigConsumer cameraConfigConsumer : cameraConfigConsumers) {
-            Properties consumerProperties = buildConsumerProperties(cameraConfigConsumer);
-            Consumer cameraConsumer = new CameraConsumer(consumerProperties);
-
+        for (Consumer imageConsumer : imageConsumers) {
             try {
                 ActorRef imageActor = system.actorOf(ImageActor.props(), "imageActor" + consumerId);
                 consumerId++;
                 while (true) {
-                    cameraConsumer.subscribe(topic);
+                    imageConsumer.subscribe(topicImage);
 
-                    ConsumerRecords<String, String> records = cameraConsumer.poll(2000);
+                    ConsumerRecords<String, String> records = imageConsumer.poll(imageConsumerPollTimeout);
                     for (ConsumerRecord<String, String> record : records) {
-
-                        Gson gson = new Gson();
-                        KafkaValue kafkaValue = gson.fromJson(record.value(), KafkaValue.class);
+                        KafkaValue kafkaValue = new ObjectMapper().readValue(record.value(), KafkaValue.class);
 
                         imageActor.tell(new ImageActor.UpdateImagePath(kafkaValue.getPayload()), imageActor);
                     }
 //                cameraConsumer.commitAsync();
                 }
+            } catch (JsonParseException e) {
+                LOG.error(e.getMessage(), e);
+            } catch (JsonMappingException e) {
+                LOG.error(e.getMessage(), e);
+            } catch (IOException e) {
+                LOG.error(e.getMessage(), e);
             } finally {
-                cameraConsumer.close();
+                imageConsumer.close();
             }
         }
-    }
-
-    private Properties buildConsumerProperties(CameraConfigConsumer cameraConfigConsumer) {
-        ConsumerPropertiesBuilder consumerPropertiesBuilder = new ConsumerPropertiesBuilder(cameraConfigConsumer.getBootstrapServerConfig(),
-                cameraConfigConsumer.getDeserializerClassConfig(), cameraConfigConsumer.getValueDeserializerClassConfig(),
-                cameraConfigConsumer.getGroupIdConfig()).withAutoOffsetResetConfig(cameraConfigConsumer.getAutoOffsetResetConfig());
-        return consumerPropertiesBuilder.build();
     }
 }

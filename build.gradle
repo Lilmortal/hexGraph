@@ -17,7 +17,6 @@ ext {
     kafkaVersion = '1.0.0'
     log4jVersion = '2.10.0'
     jacksonVersion = '2.9.3'
-    gsonVersion = '2.8.2'
 
     jUnitVersion = '4.12'
 }
@@ -31,7 +30,6 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
-    implementation "com.google.code.gson:gson:${gsonVersion}"
 
     testImplementation "junit:junit:${jUnitVersion}"
 }

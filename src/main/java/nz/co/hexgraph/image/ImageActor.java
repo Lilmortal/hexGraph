@@ -5,6 +5,7 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import nz.co.hexgraph.config.Configuration;
 import nz.co.hexgraph.config.FileType;
+import nz.co.hexgraph.pixel.PixelActor;
 import nz.co.hexgraph.reader.FileReader;
 import nz.co.hexgraph.reader.Reader;
 import nz.co.hexgraph.reader.S3Reader;

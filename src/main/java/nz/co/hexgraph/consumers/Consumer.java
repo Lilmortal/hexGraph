@@ -32,5 +32,4 @@ public abstract class Consumer extends KafkaConsumer {
         super.subscribe(Arrays.asList(topic));
     }
 
-    // TODO: Add some abstract methods here later on
 }

@@ -1,6 +1,6 @@
-package nz.co.hexgraph.config;
+package nz.co.hexgraph.consumers;
 
-public class CameraConfigConsumer {
+public class ConsumerConfig {
     private String bootstrapServerConfig;
 
     private String deserializerClassConfig;
@@ -11,8 +11,8 @@ public class CameraConfigConsumer {
 
     private String autoOffsetResetConfig;
 
-    public CameraConfigConsumer(String bootstrapServerConfig, String deserializerClassConfig,
-                                String valueDeserializerClassConfig, String groupIdConfig, String autoOffsetResetConfig) {
+    public ConsumerConfig(String bootstrapServerConfig, String deserializerClassConfig,
+                          String valueDeserializerClassConfig, String groupIdConfig, String autoOffsetResetConfig) {
         this.bootstrapServerConfig = bootstrapServerConfig;
         this.deserializerClassConfig = deserializerClassConfig;
         this.valueDeserializerClassConfig = valueDeserializerClassConfig;

@@ -1,13 +1,13 @@
-package nz.co.hexgraph.config;
+package nz.co.hexgraph.producers;
 
-public class CameraConfigProducer {
+public class ProducerConfig {
     private String bootstrapServerConfig;
 
     private String serializerClassConfig;
 
     private String valueSerializerClassConfig;
 
-    public CameraConfigProducer(String bootstrapServerConfig, String serializerClassConfig, String valueSerializerClassConfig) {
+    public ProducerConfig(String bootstrapServerConfig, String serializerClassConfig, String valueSerializerClassConfig) {
         this.bootstrapServerConfig = bootstrapServerConfig;
         this.serializerClassConfig = serializerClassConfig;
         this.valueSerializerClassConfig = valueSerializerClassConfig;
