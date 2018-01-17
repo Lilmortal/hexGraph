@@ -16,10 +16,6 @@ public class FileReader implements Reader {
         BufferedImage bufferedImage = ImageIO.read(file);
 
         return bufferedImage;
-//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//
-//        ImageIO.write(bufferedImage, "jpg", byteArrayOutputStream);
-//        byte[] imageBytes = byteArrayOutputStream.toByteArray();
     }
 
     @Override

@@ -1,14 +1,13 @@
-package nz.co.hexgraph.pixel;
+package nz.co.hexgraph.hex;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import nz.co.hexgraph.partitioner.CameraPartitioner;
 import nz.co.hexgraph.producers.Producer;
 import nz.co.hexgraph.producers.ProducerConfig;
 import nz.co.hexgraph.producers.ProducerPropertiesBuilder;
-import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 public class HexProducerBuilder {
@@ -28,6 +27,6 @@ public class HexProducerBuilder {
                 producerConfig.getSerializerClassConfig(),
                 producerConfig.getValueSerializerClassConfig());
 
-        return producerPropertiesBuilder.withPartitionerClassConfig(CameraPartitioner.class.getCanonicalName()).build();
+        return producerPropertiesBuilder.withPartitionerClassConfig(Optional.of(CameraPartitioner.class.getCanonicalName())).build();
     }
 }

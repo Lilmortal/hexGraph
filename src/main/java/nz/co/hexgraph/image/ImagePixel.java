@@ -1,17 +1,17 @@
 package nz.co.hexgraph.image;
 
-public class HexGraphImage {
-    private HexGraphImageDetails hexGraphImageDetails;
+public class ImagePixel {
+    private HexGraphImage hexGraphImage;
 
     private String hex;
 
-    public HexGraphImage(HexGraphImageDetails hexGraphImageDetails, String hex) {
-        this.hexGraphImageDetails = hexGraphImageDetails;
+    public ImagePixel(HexGraphImage hexGraphImage, String hex) {
+        this.hexGraphImage = hexGraphImage;
         this.hex = hex;
     }
 
-    public HexGraphImageDetails getHexGraphImageDetails() {
-        return hexGraphImageDetails;
+    public HexGraphImage getHexGraphImage() {
+        return hexGraphImage;
     }
 
     public String getHex() {

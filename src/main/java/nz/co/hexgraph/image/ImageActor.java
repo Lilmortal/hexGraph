@@ -5,7 +5,10 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import nz.co.hexgraph.config.Configuration;
 import nz.co.hexgraph.config.FileType;
-import nz.co.hexgraph.pixel.PixelActor;
+import nz.co.hexgraph.hex.HexActor;
+import nz.co.hexgraph.hex.HexProducerBuilder;
+import nz.co.hexgraph.producers.Producer;
+import nz.co.hexgraph.producers.ProducerConfig;
 import nz.co.hexgraph.reader.FileReader;
 import nz.co.hexgraph.reader.Reader;
 import nz.co.hexgraph.reader.S3Reader;
@@ -15,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ImageActor extends AbstractActor {
     public static Logger LOG = LoggerFactory.getLogger(ImageActor.class);
@@ -50,28 +54,35 @@ public class ImageActor extends AbstractActor {
                     reader = new S3Reader();
                     break;
                 default:
-                    // TODO: throw error
+                    throw new RuntimeException("Invalid file type.");
             }
 
             File imageFile = new File(imagePath);
             BufferedImage image = reader.getImage(imageFile);
             LocalDateTime imageCreationDate = reader.getCreationDate(imageFile);
-            ImageInfo imageInfo = new ImageInfo(imagePath, image, imageCreationDate);
+            HexGraphImage hexGraphImage = new HexGraphImage(imagePath, imageCreationDate);
 
             int processors = Runtime.getRuntime().availableProcessors();
             int numberOfPixels = image.getWidth() * image.getHeight();
 
             int numberOfPixelsPerProcessor = numberOfPixels / processors;
 
+            List<ProducerConfig> producerConfigs = configuration.getHexProducerConfigs();
+            String topicHex = configuration.getTopicHex();
+
+            HexProducerBuilder hexProducerBuilder = new HexProducerBuilder();
+            List<Producer> hexProducers = hexProducerBuilder.build(producerConfigs);
+
+            // TODO: Test performance
             for (int i = 1; i <= processors; i++) {
                 int pos = numberOfPixelsPerProcessor * i;
-                ActorRef pixelActor = getContext().actorOf(PixelActor.props());
-                pixelActor.tell(new PixelActor.UpdateImageInfo(imageInfo), getSelf());
-                pixelActor.tell(new PixelActor.UpdateImage(image), getSelf());
-                pixelActor.tell(new PixelActor.UpdatePosition(pos - numberOfPixelsPerProcessor, pos), getSelf());
+                ActorRef hexActor = getContext().actorOf(HexActor.props());
+                hexActor.tell(new HexActor.UpdateHexGraphImage(hexGraphImage), getSelf());
+                hexActor.tell(new HexActor.UpdateImage(image), getSelf());
+                hexActor.tell(new HexActor.UpdateProducers(hexProducers), getSelf());
+                hexActor.tell(new HexActor.UpdateTopic(topicHex), getSelf());
+                hexActor.tell(new HexActor.UpdatePosition(pos - numberOfPixelsPerProcessor, pos), getSelf());
             }
-        }).matchEquals(PixelActor.Message.TOPIC_MESSAGE_SENT, r -> {
-            LOG.info("Message sent to topic.");
-        }).build();
+        }).matchEquals(HexActor.Message.TOPIC_MESSAGE_SENT, r -> LOG.info("Message sent to topic.")).build();
     }
 }

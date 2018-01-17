@@ -6,6 +6,7 @@ import nz.co.hexgraph.consumers.ConsumerPropertiesBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 public class ImageConsumerBuilder {
@@ -22,7 +23,7 @@ public class ImageConsumerBuilder {
     private Properties buildConsumerProperties(ConsumerConfig consumerConfig) {
         ConsumerPropertiesBuilder consumerPropertiesBuilder = new ConsumerPropertiesBuilder(consumerConfig.getBootstrapServerConfig(),
                 consumerConfig.getDeserializerClassConfig(), consumerConfig.getValueDeserializerClassConfig(),
-                consumerConfig.getGroupIdConfig()).withAutoOffsetResetConfig(consumerConfig.getAutoOffsetResetConfig());
+                consumerConfig.getGroupIdConfig()).withAutoOffsetResetConfig(Optional.of(consumerConfig.getAutoOffsetResetConfig()));
         return consumerPropertiesBuilder.build();
     }
 }

@@ -1,4 +1,4 @@
-package nz.co.hexgraph.pixel;
+package nz.co.hexgraph.hex;
 
 import nz.co.hexgraph.producers.Producer;
 

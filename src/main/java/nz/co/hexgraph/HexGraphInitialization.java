@@ -44,6 +44,7 @@ public class HexGraphInitialization {
 
                     ConsumerRecords<String, String> records = imageConsumer.poll(imageConsumerPollTimeout);
                     for (ConsumerRecord<String, String> record : records) {
+                        LOG.debug(record.value());
                         ConsumerValue consumerValue = new ObjectMapper().readValue(record.value(), ConsumerValue.class);
 
                         imageActor.tell(new ImageActor.UpdateImagePath(consumerValue.getPayload()), imageActor);

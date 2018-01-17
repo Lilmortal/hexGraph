@@ -5,11 +5,6 @@ public class ConsumerSchema {
 
     private boolean optional;
 
-    public ConsumerSchema(String type, boolean optional) {
-        this.type = type;
-        this.optional = optional;
-    }
-
     public String getType() {
         return type;
     }
