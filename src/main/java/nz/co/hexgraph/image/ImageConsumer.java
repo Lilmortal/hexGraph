@@ -8,4 +8,9 @@ public class ImageConsumer extends Consumer {
     public ImageConsumer(Properties properties) {
         super(properties);
     }
+
+    @Override
+    public String version() {
+        return "1";
+    }
 }

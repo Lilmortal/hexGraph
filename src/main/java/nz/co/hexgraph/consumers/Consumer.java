@@ -32,4 +32,5 @@ public abstract class Consumer extends KafkaConsumer {
         super.subscribe(Arrays.asList(topic));
     }
 
+    public abstract String version();
 }

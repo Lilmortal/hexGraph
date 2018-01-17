@@ -8,4 +8,9 @@ public class HexProducer extends Producer {
     public HexProducer(Properties properties) {
         super(properties);
     }
+
+    @Override
+    public String version() {
+        return "1";
+    }
 }
