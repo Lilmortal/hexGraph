@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
-public class ImageConsumerBuilder {
+public class ImageConsumerFactory {
     public List<Consumer> build(List<ConsumerConfig> consumerConfigs) {
         List<Consumer> consumers = new ArrayList<>();
         for (ConsumerConfig consumerConfig : consumerConfigs) {

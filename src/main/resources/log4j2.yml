@@ -12,7 +12,7 @@ Configutation:
         pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
     File:
       name: File_Appender
-      fileName: ${LOG-path}/logfile.LOG
+      fileName: ${LOGGER-path}/logfile.LOGGER
       PatternLayout:
         pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
   Loggers:

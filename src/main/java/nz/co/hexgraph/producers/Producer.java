@@ -24,6 +24,8 @@ public abstract class Producer extends KafkaProducer {
         super(properties, keySerializer, valueSerializer);
     }
 
+    public abstract String name();
+
     public abstract String version();
 }
 

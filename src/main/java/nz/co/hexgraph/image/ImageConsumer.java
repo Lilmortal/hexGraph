@@ -10,6 +10,11 @@ public class ImageConsumer extends Consumer {
     }
 
     @Override
+    public String name() {
+        return "image consumer";
+    }
+
+    @Override
     public String version() {
         return "1";
     }

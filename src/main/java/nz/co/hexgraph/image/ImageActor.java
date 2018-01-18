@@ -6,7 +6,7 @@ import akka.actor.Props;
 import nz.co.hexgraph.config.Configuration;
 import nz.co.hexgraph.config.FileType;
 import nz.co.hexgraph.hex.HexActor;
-import nz.co.hexgraph.hex.HexProducerBuilder;
+import nz.co.hexgraph.hex.HexProducerFactory;
 import nz.co.hexgraph.producers.Producer;
 import nz.co.hexgraph.producers.ProducerConfig;
 import nz.co.hexgraph.reader.FileReader;
@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class ImageActor extends AbstractActor {
-    public static Logger LOG = LoggerFactory.getLogger(ImageActor.class);
+    public static Logger LOGGER = LoggerFactory.getLogger(ImageActor.class);
 
     private String imagePath;
 
@@ -39,50 +39,53 @@ public class ImageActor extends AbstractActor {
 
     @Override
     public Receive createReceive() {
-        return receiveBuilder().match(UpdateImagePath.class, r -> {
-            this.imagePath = r.imagePath;
+        return receiveBuilder()
+                .match(UpdateImagePath.class, r -> {
+                    this.imagePath = r.imagePath;
 
-            Configuration configuration = Configuration.getInstance();
-            FileType fileType = configuration.getImageFileType();
+                    Configuration configuration = Configuration.getInstance();
+                    FileType fileType = configuration.getImageFileType();
+                    List<ProducerConfig> hexProducerConfigs = configuration.getHexProducerConfigs();
+                    String topicHex = configuration.getTopicHex();
 
-            Reader reader = null;
-            switch (fileType) {
-                case FILE:
-                    reader = new FileReader();
-                    break;
-                case S3:
-                    reader = new S3Reader();
-                    break;
-                default:
-                    throw new RuntimeException("Invalid file type.");
-            }
+                    Reader reader = null;
+                    switch (fileType) {
+                        case FILE:
+                            reader = new FileReader();
+                            break;
+                        case S3:
+                            reader = new S3Reader();
+                            break;
+                        default:
+                            throw new RuntimeException("Invalid file type.");
+                    }
 
-            File imageFile = new File(imagePath);
-            BufferedImage image = reader.getImage(imageFile);
-            LocalDateTime imageCreationDate = reader.getCreationDate(imageFile);
-            HexGraphImage hexGraphImage = new HexGraphImage(imagePath, imageCreationDate);
+                    File imageFile = new File(imagePath);
+                    BufferedImage image = reader.getImage(imageFile);
+                    LocalDateTime imageCreationDate = reader.getCreationDate(imageFile);
+                    HexGraphImage hexGraphImage = new HexGraphImage(imagePath, imageCreationDate);
 
-            int processors = Runtime.getRuntime().availableProcessors();
-            int numberOfPixels = image.getWidth() * image.getHeight();
+                    int processors = Runtime.getRuntime().availableProcessors();
+                    int numberOfPixels = image.getWidth() * image.getHeight();
 
-            int numberOfPixelsPerProcessor = numberOfPixels / processors;
+                    int numberOfPixelsPerProcessor = numberOfPixels / processors;
 
-            List<ProducerConfig> producerConfigs = configuration.getHexProducerConfigs();
-            String topicHex = configuration.getTopicHex();
+                    LOGGER.info("There are " + processors + " processors, each handling " + numberOfPixelsPerProcessor +
+                            " pixels");
 
-            HexProducerBuilder hexProducerBuilder = new HexProducerBuilder();
-            List<Producer> hexProducers = hexProducerBuilder.build(producerConfigs);
+                    HexProducerFactory hexProducerFactory = new HexProducerFactory();
+                    List<Producer> hexProducers = hexProducerFactory.build(hexProducerConfigs);
 
-            // TODO: Test performance
-            for (int i = 1; i <= processors; i++) {
-                int pos = numberOfPixelsPerProcessor * i;
-                ActorRef hexActor = getContext().actorOf(HexActor.props());
-                hexActor.tell(new HexActor.UpdateHexGraphImage(hexGraphImage), getSelf());
-                hexActor.tell(new HexActor.UpdateImage(image), getSelf());
-                hexActor.tell(new HexActor.UpdateProducers(hexProducers), getSelf());
-                hexActor.tell(new HexActor.UpdateTopic(topicHex), getSelf());
-                hexActor.tell(new HexActor.UpdatePosition(pos - numberOfPixelsPerProcessor, pos), getSelf());
-            }
-        }).matchEquals(HexActor.Message.TOPIC_MESSAGE_SENT, r -> LOG.info("Message sent to topic.")).build();
+                    // TODO: Test performance
+                    for (int i = 1; i <= processors; i++) {
+                        int pos = numberOfPixelsPerProcessor * i;
+                        ActorRef hexActor = getContext().actorOf(HexActor.props());
+                        hexActor.tell(new HexActor.UpdateHexGraphImage(hexGraphImage), getSelf());
+                        hexActor.tell(new HexActor.UpdateImage(image), getSelf());
+                        hexActor.tell(new HexActor.UpdateProducers(hexProducers), getSelf());
+                        hexActor.tell(new HexActor.UpdateTopic(topicHex), getSelf());
+                        hexActor.tell(new HexActor.UpdatePosition(pos - numberOfPixelsPerProcessor, pos), getSelf());
+                    }
+                }).matchEquals(HexActor.Message.TOPIC_MESSAGE_SENT, r -> LOGGER.debug("Message sent to topic.")).build();
     }
 }

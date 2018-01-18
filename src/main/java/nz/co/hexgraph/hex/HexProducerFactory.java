@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
-public class HexProducerBuilder {
+public class HexProducerFactory {
     public List<Producer> build(List<ProducerConfig> producerConfigs) {
         List<Producer> producers = new ArrayList<>();
         for (ProducerConfig producerConfig : producerConfigs) {

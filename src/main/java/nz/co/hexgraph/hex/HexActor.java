@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.co.hexgraph.image.ImagePixel;
 import nz.co.hexgraph.image.HexGraphImage;
-import nz.co.hexgraph.producers.ProducerConfig;
-import nz.co.hexgraph.config.Configuration;
 import nz.co.hexgraph.producers.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
@@ -17,7 +15,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 public class HexActor extends AbstractActor {
-    public static final Logger LOG = LoggerFactory.getLogger(HexActor.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(HexActor.class);
 
     private BufferedImage image;
 
@@ -109,8 +107,8 @@ public class HexActor extends AbstractActor {
                         try {
                             rgb = image.getRGB(x, y);
                         } catch (ArrayIndexOutOfBoundsException e) {
-                            LOG.error(e.getMessage());
-                            LOG.error("Array out of bounds with x:" + x + ", y:" + y);
+                            LOGGER.error(e.getMessage());
+                            LOGGER.error("Array out of bounds with x:" + x + ", y:" + y);
                         }
 
                         int red = (rgb >> 16) & 0x000000FF;
@@ -119,15 +117,17 @@ public class HexActor extends AbstractActor {
 
                         String hex = String.format("#%02x%02x%02x", red, green, blue);
 
+                        LOGGER.debug("Image with path " + hexGraphImage.getImagePath() + "has rgb value as " +
+                                red + "," + green + "," + "blue" + " with it's hex code as " + hex);
+
                         ImagePixel imagePixel = new ImagePixel(hexGraphImage, hex);
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        JsonNode jsonNode = objectMapper.valueToTree(imagePixel);
+                        byte[] imagePixelBytes = new ObjectMapper().writeValueAsBytes(imagePixel);
 
                         for (Producer producer : producers) {
-                            ProducerRecord<String, JsonNode> hexProducerRecord = new ProducerRecord<>(topic, jsonNode);
-                            LOG.info(imagePixel.getHex());
-//                    producer.send(hexProducerRecord);
+                            ProducerRecord<String, byte[]> hexProducerRecord = new ProducerRecord<>(topic, imagePixelBytes);
+                            producer.send(hexProducerRecord);
                         }
+
 
                         getSender().tell(Message.TOPIC_MESSAGE_SENT, getSelf());
                     }

@@ -10,6 +10,11 @@ public class HexProducer extends Producer {
     }
 
     @Override
+    public String name() {
+        return "hex producer";
+    }
+
+    @Override
     public String version() {
         return "1";
     }
