@@ -20,72 +20,88 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static nz.co.hexgraph.hex.HexActor.Message.SEND_HEX_TOPIC_MESSAGE;
+import static nz.co.hexgraph.hex.HexActor.Message.TOPIC_MESSAGE_SENT;
+import static nz.co.hexgraph.image.ImageActor.MESSAGE.UPDATE_PIXEL_COUNTS;
+
 public class ImageActor extends AbstractActor {
     public static Logger LOGGER = LoggerFactory.getLogger(ImageActor.class);
 
-    private String imagePath;
+    private static final int PROCESSORS = Runtime.getRuntime().availableProcessors();
+
+    private HexGraphImage hexGraphImage;
+
+    private BufferedImage image;
+
+    private List<Producer> producers;
+
+    private String topic;
 
     public static Props props() {
         return Props.create(ImageActor.class);
     }
 
-    public static class UpdateImagePath {
-        private String imagePath;
+    public enum MESSAGE {
+        UPDATE_PIXEL_COUNTS
+    }
 
-        public UpdateImagePath(String imagePath) {
-            this.imagePath = imagePath;
+    public static class UpdateHexGraphImage {
+        private HexGraphImage hexGraphImage;
+
+        public UpdateHexGraphImage(HexGraphImage hexGraphImage) {
+            this.hexGraphImage = hexGraphImage;
+        }
+    }
+
+    public static class UpdateImage {
+        private BufferedImage image;
+
+        public UpdateImage(BufferedImage image) {
+            this.image = image;
+        }
+    }
+
+    public static class UpdateProducers {
+        private List<Producer> producers;
+
+        public UpdateProducers(List<Producer> producers) {
+            this.producers = producers;
+        }
+    }
+
+    public static class UpdateTopic {
+        private String topic;
+
+        public UpdateTopic(String topic) {
+            this.topic = topic;
         }
     }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(UpdateImagePath.class, r -> {
-                    this.imagePath = r.imagePath;
-
-                    Configuration configuration = Configuration.getInstance();
-                    FileType fileType = configuration.getImageFileType();
-                    List<ProducerConfig> hexProducerConfigs = configuration.getHexProducerConfigs();
-                    String topicHex = configuration.getTopicHex();
-
-                    Reader reader = null;
-                    switch (fileType) {
-                        case FILE:
-                            reader = new FileReader();
-                            break;
-                        case S3:
-                            reader = new S3Reader();
-                            break;
-                        default:
-                            throw new RuntimeException("Invalid file type.");
-                    }
-
-                    File imageFile = new File(imagePath);
-                    BufferedImage image = reader.getImage(imageFile);
-                    LocalDateTime imageCreationDate = reader.getCreationDate(imageFile);
-                    HexGraphImage hexGraphImage = new HexGraphImage(imagePath, imageCreationDate);
-
-                    int processors = Runtime.getRuntime().availableProcessors();
+                .match(UpdateHexGraphImage.class, r -> this.hexGraphImage = r.hexGraphImage)
+                .match(UpdateImage.class, r -> this.image = r.image)
+                .match(UpdateProducers.class, r -> this.producers = r.producers)
+                .match(UpdateTopic.class, r -> this.topic = r.topic)
+                .matchEquals(UPDATE_PIXEL_COUNTS, r -> {
                     int numberOfPixels = image.getWidth() * image.getHeight();
 
-                    int numberOfPixelsPerProcessor = numberOfPixels / processors;
+                    LOGGER.info("There are " +  numberOfPixels + " pixels split between " + PROCESSORS + " processors.");
 
-                    LOGGER.info("There are " + processors + " processors, each handling " + numberOfPixelsPerProcessor +
-                            " pixels");
-
-                    HexProducerFactory hexProducerFactory = new HexProducerFactory();
-                    List<Producer> hexProducers = hexProducerFactory.build(hexProducerConfigs);
+                    int numberOfPixelsPerProcessor = numberOfPixels / PROCESSORS;
 
                     // TODO: Test performance
-                    for (int i = 1; i <= processors; i++) {
+                    for (int i = 1; i <= PROCESSORS; i++) {
                         int pos = numberOfPixelsPerProcessor * i;
                         ActorRef hexActor = getContext().actorOf(HexActor.props());
                         hexActor.tell(new HexActor.UpdateHexGraphImage(hexGraphImage), getSelf());
                         hexActor.tell(new HexActor.UpdateImage(image), getSelf());
-                        hexActor.tell(new HexActor.UpdateProducers(hexProducers), getSelf());
-                        hexActor.tell(new HexActor.UpdateTopic(topicHex), getSelf());
+                        hexActor.tell(new HexActor.UpdateProducers(producers), getSelf());
+                        hexActor.tell(new HexActor.UpdateTopic(topic), getSelf());
                         hexActor.tell(new HexActor.UpdatePosition(pos - numberOfPixelsPerProcessor, pos), getSelf());
+                        hexActor.tell(SEND_HEX_TOPIC_MESSAGE, getSelf());
                     }
-                }).matchEquals(HexActor.Message.TOPIC_MESSAGE_SENT, r -> LOGGER.debug("Message sent to topic.")).build();
+                }).matchEquals(TOPIC_MESSAGE_SENT, r -> LOGGER.info("Message sent to topic.")).build();
     }
 }

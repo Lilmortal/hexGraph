@@ -1,6 +1,5 @@
 package nz.co.hexgraph.hex;
 
-import nz.co.hexgraph.partitioner.CameraPartitioner;
 import nz.co.hexgraph.producers.Producer;
 import nz.co.hexgraph.producers.ProducerConfig;
 import nz.co.hexgraph.producers.ProducerPropertiesBuilder;
@@ -27,6 +26,6 @@ public class HexProducerFactory {
                 producerConfig.getSerializerClassConfig(),
                 producerConfig.getValueSerializerClassConfig());
 
-        return producerPropertiesBuilder.withPartitionerClassConfig(Optional.of(CameraPartitioner.class.getCanonicalName())).build();
+        return producerPropertiesBuilder.build();
     }
 }

@@ -14,6 +14,9 @@ import org.slf4j.LoggerFactory;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+import static nz.co.hexgraph.hex.HexActor.Message.SEND_HEX_TOPIC_MESSAGE;
+import static nz.co.hexgraph.hex.HexActor.Message.TOPIC_MESSAGE_SENT;
+
 public class HexActor extends AbstractActor {
     public static final Logger LOGGER = LoggerFactory.getLogger(HexActor.class);
 
@@ -76,6 +79,7 @@ public class HexActor extends AbstractActor {
     }
 
     public enum Message {
+        SEND_HEX_TOPIC_MESSAGE,
         TOPIC_MESSAGE_SENT
     }
 
@@ -89,7 +93,8 @@ public class HexActor extends AbstractActor {
                 .match(UpdatePosition.class, r -> {
                     this.from = r.from;
                     this.to = r.to;
-
+                })
+                .matchEquals(SEND_HEX_TOPIC_MESSAGE, r -> {
                     int width = image.getWidth();
 
                     for (int i = from; i < to; i++) {
@@ -117,8 +122,8 @@ public class HexActor extends AbstractActor {
 
                         String hex = String.format("#%02x%02x%02x", red, green, blue);
 
-                        LOGGER.debug("Image with path " + hexGraphImage.getImagePath() + "has rgb value as " +
-                                red + "," + green + "," + "blue" + " with it's hex code as " + hex);
+                        LOGGER.info("Image with path " + hexGraphImage.getImagePath() + " has rgb value as " +
+                                red + "," + green + "," + blue + " with it's hex code as " + hex);
 
                         ImagePixel imagePixel = new ImagePixel(hexGraphImage, hex);
                         byte[] imagePixelBytes = new ObjectMapper().writeValueAsBytes(imagePixel);
@@ -128,8 +133,7 @@ public class HexActor extends AbstractActor {
                             producer.send(hexProducerRecord);
                         }
 
-
-                        getSender().tell(Message.TOPIC_MESSAGE_SENT, getSelf());
+                        getSender().tell(TOPIC_MESSAGE_SENT, getSelf());
                     }
 
                 }).build();
