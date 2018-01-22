@@ -49,12 +49,10 @@ public class HexGraphInitialization {
         ImageConsumerFactory imageConsumerFactory = new ImageConsumerFactory();
         List<HexGraphConsumer> imageHexGraphConsumers = imageConsumerFactory.build(imageHexGraphConsumerConfigs);
 
-        ActorSystem system = ActorSystem.create("hexGraph");
-
         HexProducerFactory hexProducerFactory = new HexProducerFactory();
-        List<HexGraphProducer> hexHexGraphProducers = hexProducerFactory.build(hexHexGraphProducerConfigs);
+        List<HexGraphProducer> hexGraphProducers = hexProducerFactory.build(hexHexGraphProducerConfigs);
 
-        Reader reader = ReaderFactory.create(fileType);
+        ActorSystem system = ActorSystem.create("hexGraph");
 
         int consumerId = 0;
         for (HexGraphConsumer imageHexGraphConsumer : imageHexGraphConsumers) {
@@ -74,14 +72,9 @@ public class HexGraphInitialization {
                         String imagePath = consumerValue.getPayload();
                         LOGGER.debug("Image path: " + imagePath);
 
-                        File imageFile = new File(imagePath);
-                        BufferedImage image = reader.getImage(imageFile);
-                        LocalDateTime imageCreationDate = reader.getCreationDate(imageFile);
-                        HexGraphImage hexGraphImage = new HexGraphImage(imagePath, imageCreationDate);
-
-                        imageActor.tell(new ImageActor.UpdateHexGraphImage(hexGraphImage), imageActor);
-                        imageActor.tell(new ImageActor.UpdateImage(image), imageActor);
-                        imageActor.tell(new ImageActor.UpdateProducers(hexHexGraphProducers), imageActor);
+                        imageActor.tell(new ImageActor.UpdateImagePath(imagePath), imageActor);
+                        imageActor.tell(new ImageActor.UpdateFileType(fileType), imageActor);
+                        imageActor.tell(new ImageActor.UpdateProducers(hexGraphProducers), imageActor);
                         imageActor.tell(new ImageActor.UpdateTopic(topicHex), imageActor);
                         imageActor.tell(UPDATE_PIXEL_COUNTS, imageActor);
                     }

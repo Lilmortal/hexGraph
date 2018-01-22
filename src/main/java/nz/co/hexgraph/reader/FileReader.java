@@ -12,14 +12,16 @@ import java.time.ZoneId;
 
 public class FileReader implements Reader {
     @Override
-    public BufferedImage getImage(File file) throws IOException {
+    public BufferedImage getImage(String imagePath) throws IOException {
+        File file = new File(imagePath);
         BufferedImage bufferedImage = ImageIO.read(file);
 
         return bufferedImage;
     }
 
     @Override
-    public LocalDateTime getCreationDate(File file) throws IOException {
+    public LocalDateTime getCreationDate(String imagePath) throws IOException {
+        File file = new File(imagePath);
         BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
         return attr.creationTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
