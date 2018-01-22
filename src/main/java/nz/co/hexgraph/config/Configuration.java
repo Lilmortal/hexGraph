@@ -1,7 +1,7 @@
 package nz.co.hexgraph.config;
 
-import nz.co.hexgraph.consumers.ConsumerConfig;
-import nz.co.hexgraph.producers.ProducerConfig;
+import nz.co.hexgraph.consumers.HexGraphConsumerConfig;
+import nz.co.hexgraph.producers.HexGraphProducerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +50,9 @@ public class Configuration {
 
     private FileType imageFileType;
 
-    private List<ProducerConfig> hexProducerConfigs = new ArrayList<>();
+    private List<HexGraphProducerConfig> hexHexGraphProducerConfigs = new ArrayList<>();
 
-    private List<ConsumerConfig> imageConsumerConfigs = new ArrayList<>();
+    private List<HexGraphConsumerConfig> imageHexGraphConsumerConfigs = new ArrayList<>();
 
     private int imageConsumerPollTimeout;
 
@@ -73,9 +73,9 @@ public class Configuration {
             String cameraProducerBootstrapServerConfig = properties.getProperty(String.format(HEX_PRODUCER_BOOTSTRAP_SERVER_CONFIG_NAME, i));
             String cameraProducerSerializerClassConfig = properties.getProperty(String.format(HEX_PRODUCER_SERIALIZER_CLASS_CONFIG_NAME, i));
             String cameraProducerValueSerializerClassConfig = properties.getProperty(String.format(HEX_PRODUCER_VALUE_SERIALIZER_CLASS_CONFIG_NAME, i));
-            ProducerConfig hexProducerConfig = new ProducerConfig(cameraProducerBootstrapServerConfig, cameraProducerSerializerClassConfig,
+            HexGraphProducerConfig hexHexGraphProducerConfig = new HexGraphProducerConfig(cameraProducerBootstrapServerConfig, cameraProducerSerializerClassConfig,
                     cameraProducerValueSerializerClassConfig);
-            hexProducerConfigs.add(hexProducerConfig);
+            hexHexGraphProducerConfigs.add(hexHexGraphProducerConfig);
             i++;
         }
 
@@ -86,10 +86,10 @@ public class Configuration {
             String cameraConsumerValueDeserializerClassConfig = properties.getProperty(String.format(IMAGE_CONSUMER_VALUE_DESERIALIZER_CLASS_CONFIG_NAME, i));
             String cameraConsumerGroupIdConfig = properties.getProperty(String.format(IMAGE_CONSUMER_GROUP_ID_CONFIG_NAME, i));
             String cameraConsumerAutoOffsetResetConfig = properties.getProperty(String.format(IMAGE_CONSUMER_AUTO_OFFSET_RESET_CONFIG_NAME, i));
-            ConsumerConfig imageConsumerConfig = new ConsumerConfig(cameraConsumerBootstrapServerConfig,
+            HexGraphConsumerConfig imageHexGraphConsumerConfig = new HexGraphConsumerConfig(cameraConsumerBootstrapServerConfig,
                     cameraConsumerDeserializerClassConfig, cameraConsumerValueDeserializerClassConfig,
                     cameraConsumerGroupIdConfig, cameraConsumerAutoOffsetResetConfig);
-            imageConsumerConfigs.add(imageConsumerConfig);
+            imageHexGraphConsumerConfigs.add(imageHexGraphConsumerConfig);
             i++;
         }
 
@@ -116,12 +116,12 @@ public class Configuration {
         return imageFileType;
     }
 
-    public List<ProducerConfig> getHexProducerConfigs() {
-        return hexProducerConfigs;
+    public List<HexGraphProducerConfig> getHexHexGraphProducerConfigs() {
+        return hexHexGraphProducerConfigs;
     }
 
-    public List<ConsumerConfig> getImageConsumerConfigs() {
-        return imageConsumerConfigs;
+    public List<HexGraphConsumerConfig> getImageHexGraphConsumerConfigs() {
+        return imageHexGraphConsumerConfigs;
     }
 
     public int getImageConsumerPollTimeout() {

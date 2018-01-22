@@ -3,7 +3,7 @@ package nz.co.hexgraph.reader;
 import nz.co.hexgraph.config.FileType;
 
 public class ReaderFactory {
-    public static Reader getReader(FileType fileType) {
+    public static Reader create(FileType fileType) {
         Reader reader = null;
         switch (fileType) {
             case FILE:

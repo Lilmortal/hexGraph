@@ -1,13 +1,13 @@
 package nz.co.hexgraph.producers;
 
-public class ProducerConfig {
+public class HexGraphProducerConfig {
     private String bootstrapServerConfig;
 
     private String serializerClassConfig;
 
     private String valueSerializerClassConfig;
 
-    public ProducerConfig(String bootstrapServerConfig, String serializerClassConfig, String valueSerializerClassConfig) {
+    public HexGraphProducerConfig(String bootstrapServerConfig, String serializerClassConfig, String valueSerializerClassConfig) {
         this.bootstrapServerConfig = bootstrapServerConfig;
         this.serializerClassConfig = serializerClassConfig;
         this.valueSerializerClassConfig = valueSerializerClassConfig;
@@ -27,7 +27,7 @@ public class ProducerConfig {
 
     @Override
     public String toString() {
-        return "ProducerConfig{" +
+        return "HexGraphProducerConfig{" +
                 "bootstrapServerConfig='" + bootstrapServerConfig + '\'' +
                 ", serializerClassConfig='" + serializerClassConfig + '\'' +
                 ", valueSerializerClassConfig='" + valueSerializerClassConfig + '\'' +

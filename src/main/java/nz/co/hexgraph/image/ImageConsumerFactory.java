@@ -1,7 +1,7 @@
 package nz.co.hexgraph.image;
 
-import nz.co.hexgraph.consumers.ConsumerConfig;
-import nz.co.hexgraph.consumers.Consumer;
+import nz.co.hexgraph.consumers.HexGraphConsumer;
+import nz.co.hexgraph.consumers.HexGraphConsumerConfig;
 import nz.co.hexgraph.consumers.ConsumerPropertiesBuilder;
 
 import java.util.ArrayList;
@@ -10,20 +10,20 @@ import java.util.Optional;
 import java.util.Properties;
 
 public class ImageConsumerFactory {
-    public List<Consumer> build(List<ConsumerConfig> consumerConfigs) {
-        List<Consumer> consumers = new ArrayList<>();
-        for (ConsumerConfig consumerConfig : consumerConfigs) {
-            Properties consumerProperties = buildConsumerProperties(consumerConfig);
-            Consumer cameraConsumer = new ImageConsumer(consumerProperties);
-            consumers.add(cameraConsumer);
+    public List<HexGraphConsumer> build(List<HexGraphConsumerConfig> hexGraphConsumerConfigs) {
+        List<HexGraphConsumer> hexGraphConsumers = new ArrayList<>();
+        for (HexGraphConsumerConfig hexGraphConsumerConfig : hexGraphConsumerConfigs) {
+            Properties consumerProperties = buildConsumerProperties(hexGraphConsumerConfig);
+            HexGraphConsumer cameraHexGraphConsumer = new ImageHexGraphConsumer(consumerProperties);
+            hexGraphConsumers.add(cameraHexGraphConsumer);
         }
-        return consumers;
+        return hexGraphConsumers;
     }
 
-    private Properties buildConsumerProperties(ConsumerConfig consumerConfig) {
-        ConsumerPropertiesBuilder consumerPropertiesBuilder = new ConsumerPropertiesBuilder(consumerConfig.getBootstrapServerConfig(),
-                consumerConfig.getDeserializerClassConfig(), consumerConfig.getValueDeserializerClassConfig(),
-                consumerConfig.getGroupIdConfig()).withAutoOffsetResetConfig(Optional.of(consumerConfig.getAutoOffsetResetConfig()));
+    private Properties buildConsumerProperties(HexGraphConsumerConfig hexGraphConsumerConfig) {
+        ConsumerPropertiesBuilder consumerPropertiesBuilder = new ConsumerPropertiesBuilder(hexGraphConsumerConfig.getBootstrapServerConfig(),
+                hexGraphConsumerConfig.getDeserializerClassConfig(), hexGraphConsumerConfig.getValueDeserializerClassConfig(),
+                hexGraphConsumerConfig.getGroupIdConfig()).withAutoOffsetResetConfig(Optional.of(hexGraphConsumerConfig.getAutoOffsetResetConfig()));
         return consumerPropertiesBuilder.build();
     }
 }

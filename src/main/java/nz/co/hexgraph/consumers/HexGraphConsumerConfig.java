@@ -1,6 +1,6 @@
 package nz.co.hexgraph.consumers;
 
-public class ConsumerConfig {
+public class HexGraphConsumerConfig {
     private String bootstrapServerConfig;
 
     private String deserializerClassConfig;
@@ -11,8 +11,8 @@ public class ConsumerConfig {
 
     private String autoOffsetResetConfig;
 
-    public ConsumerConfig(String bootstrapServerConfig, String deserializerClassConfig,
-                          String valueDeserializerClassConfig, String groupIdConfig, String autoOffsetResetConfig) {
+    public HexGraphConsumerConfig(String bootstrapServerConfig, String deserializerClassConfig,
+                                  String valueDeserializerClassConfig, String groupIdConfig, String autoOffsetResetConfig) {
         this.bootstrapServerConfig = bootstrapServerConfig;
         this.deserializerClassConfig = deserializerClassConfig;
         this.valueDeserializerClassConfig = valueDeserializerClassConfig;
@@ -42,7 +42,7 @@ public class ConsumerConfig {
 
     @Override
     public String toString() {
-        return "ConsumerConfig{" +
+        return "HexGraphConsumerConfig{" +
                 "bootstrapServerConfig='" + bootstrapServerConfig + '\'' +
                 ", deserializerClassConfig='" + deserializerClassConfig + '\'' +
                 ", valueDeserializerClassConfig='" + valueDeserializerClassConfig + '\'' +

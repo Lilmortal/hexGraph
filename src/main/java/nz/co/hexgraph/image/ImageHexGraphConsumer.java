@@ -1,11 +1,11 @@
 package nz.co.hexgraph.image;
 
-import nz.co.hexgraph.consumers.Consumer;
+import nz.co.hexgraph.consumers.HexGraphConsumer;
 
 import java.util.Properties;
 
-public class ImageConsumer extends Consumer {
-    public ImageConsumer(Properties properties) {
+public class ImageHexGraphConsumer extends HexGraphConsumer {
+    public ImageHexGraphConsumer(Properties properties) {
         super(properties);
     }
 

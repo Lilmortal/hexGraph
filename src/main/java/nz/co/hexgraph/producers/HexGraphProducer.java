@@ -6,21 +6,21 @@ import org.apache.kafka.common.serialization.Serializer;
 import java.util.Map;
 import java.util.Properties;
 
-public abstract class Producer extends KafkaProducer {
+public abstract class HexGraphProducer extends KafkaProducer {
 
-    public Producer(Map configs) {
+    public HexGraphProducer(Map configs) {
         super(configs);
     }
 
-    public Producer(Map configs, Serializer keySerializer, Serializer valueSerializer) {
+    public HexGraphProducer(Map configs, Serializer keySerializer, Serializer valueSerializer) {
         super(configs, keySerializer, valueSerializer);
     }
 
-    public Producer(Properties properties) {
+    public HexGraphProducer(Properties properties) {
         super(properties);
     }
 
-    public Producer(Properties properties, Serializer keySerializer, Serializer valueSerializer) {
+    public HexGraphProducer(Properties properties, Serializer keySerializer, Serializer valueSerializer) {
         super(properties, keySerializer, valueSerializer);
     }
 

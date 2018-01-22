@@ -9,7 +9,7 @@ version '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 ext {
@@ -52,4 +52,8 @@ task run(type: JavaExec) {
     dependsOn shadowJar
     classpath = shadowJar.outputs.files
     main = mainClass
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.1' //version required
 }

@@ -2,11 +2,10 @@ package nz.co.hexgraph.hex;
 
 import akka.actor.AbstractActor;
 import akka.actor.Props;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.co.hexgraph.image.ImagePixel;
 import nz.co.hexgraph.image.HexGraphImage;
-import nz.co.hexgraph.producers.Producer;
+import nz.co.hexgraph.producers.HexGraphProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,7 @@ public class HexActor extends AbstractActor {
 
     private HexGraphImage hexGraphImage;
 
-    private List<Producer> producers;
+    private List<HexGraphProducer> hexGraphProducers;
 
     private String topic;
 
@@ -53,10 +52,10 @@ public class HexActor extends AbstractActor {
     }
 
     public static class UpdateProducers {
-        private List<Producer> producers;
+        private List<HexGraphProducer> hexGraphProducers;
 
-        public UpdateProducers(List<Producer> producers) {
-            this.producers = producers;
+        public UpdateProducers(List<HexGraphProducer> hexGraphProducers) {
+            this.hexGraphProducers = hexGraphProducers;
         }
     }
 
@@ -88,7 +87,7 @@ public class HexActor extends AbstractActor {
         return receiveBuilder()
                 .match(UpdateHexGraphImage.class, r -> this.hexGraphImage = r.hexGraphImage)
                 .match(UpdateImage.class, r -> this.image = r.image)
-                .match(UpdateProducers.class, r -> this.producers = r.producers)
+                .match(UpdateProducers.class, r -> this.hexGraphProducers = r.hexGraphProducers)
                 .match(UpdateTopic.class, r -> this.topic = r.topic)
                 .match(UpdatePosition.class, r -> {
                     this.from = r.from;
@@ -128,9 +127,9 @@ public class HexActor extends AbstractActor {
                         ImagePixel imagePixel = new ImagePixel(hexGraphImage, hex);
                         byte[] imagePixelBytes = new ObjectMapper().writeValueAsBytes(imagePixel);
 
-                        for (Producer producer : producers) {
+                        for (HexGraphProducer hexGraphProducer : hexGraphProducers) {
                             ProducerRecord<String, byte[]> hexProducerRecord = new ProducerRecord<>(topic, imagePixelBytes);
-                            producer.send(hexProducerRecord);
+                            hexGraphProducer.send(hexProducerRecord);
                         }
 
                         getSender().tell(TOPIC_MESSAGE_SENT, getSelf());
