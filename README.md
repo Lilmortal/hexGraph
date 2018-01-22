@@ -1,6 +1,6 @@
 Working in progress...
 
-The main goal of this project is to calculate all the hex code in a given image which will be provided by my raspberry pi taking a picture of the outside view every 3 seconds. The images will be push to a kafka topic, and the consumers will retrieve that image, split the workload of calculating the hex codes via the maximum number of threads available on your machine, and then display the results as well as a long term graph on a dashboard.
+The main goal of this project is to calculate all the hex code in a given image which will be provided by my raspberry pi taking a picture of the outside view every 3 seconds. The images will be push to a kafka topic, and the hexGraphConsumers will retrieve that image, split the workload of calculating the hex codes via the maximum number of threads available on your machine, and then display the results as well as a long term graph on a dashboard.
 I will be working with Akka, using the actor model to handle my parallelism, as well as storing the results into Cassandra.
 
 I might look into Apache Camel in terms of getting the images from elsewhere and copying it into a specfic folder (I haven't look too deeply into Camel yet so I don't know what can it do), as well as potentially using Apache Spark on working with the calculations.

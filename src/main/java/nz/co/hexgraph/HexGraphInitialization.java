@@ -2,21 +2,22 @@ package nz.co.hexgraph;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import com.google.gson.Gson;
-import nz.co.hexgraph.camera.CameraConsumer;
-import nz.co.hexgraph.config.CameraConfigConsumer;
-import nz.co.hexgraph.config.CameraConfigProducer;
-import nz.co.hexgraph.config.Configuration;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.co.hexgraph.config.FileType;
-import nz.co.hexgraph.consumers.Consumer;
-import nz.co.hexgraph.consumers.ConsumerPropertiesBuilder;
+import nz.co.hexgraph.consumers.HexGraphConsumer;
+import nz.co.hexgraph.consumers.HexGraphConsumerConfig;
+import nz.co.hexgraph.config.Configuration;
+import nz.co.hexgraph.hex.HexProducerFactory;
+import nz.co.hexgraph.image.HexGraphImage;
 import nz.co.hexgraph.image.ImageActor;
-import nz.co.hexgraph.partitioner.CameraPartitioner;
-import nz.co.hexgraph.producers.ProducerPropertiesBuilder;
-import nz.co.hexgraph.reader.FileReader;
-import nz.co.hexgraph.reader.KafkaValue;
+import nz.co.hexgraph.image.ImageConsumerFactory;
+import nz.co.hexgraph.consumers.ConsumerValue;
+import nz.co.hexgraph.producers.HexGraphProducer;
+import nz.co.hexgraph.producers.HexGraphProducerConfig;
 import nz.co.hexgraph.reader.Reader;
-import nz.co.hexgraph.reader.S3Reader;
+import nz.co.hexgraph.reader.ReaderFactory;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.slf4j.Logger;
@@ -25,111 +26,76 @@ import org.slf4j.LoggerFactory;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.util.*;
 
+import static nz.co.hexgraph.image.ImageActor.MESSAGE.UPDATE_PIXEL_COUNTS;
+
 public class HexGraphInitialization {
-    public static final Logger log = LoggerFactory.getLogger(HexGraphInitialization.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(HexGraphInitialization.class);
 
     public void start() {
         Configuration configuration = Configuration.getInstance();
 
-        String topic = configuration.getTopic();
-        List<CameraConfigProducer> cameraConfigProducers = configuration.getCameraConfigProducers();
-        List<CameraConfigConsumer> cameraConfigConsumers = configuration.getCameraConfigConsumers();
-        Map<String, String> partitionConfig = configuration.getPartitions();
+        LOGGER.info("Config properties successfully read.");
 
-//        // TODO: Come back in 1 year and see if lambda is more intuitive than for loops
-//        cameraConfigProducers.stream().forEach(cameraConfigProducer -> {
-//            Properties producerProperties = buildProducerProperties(cameraConfigProducer, partitionConfig);
-//            Producer cameraProducer = new CameraProducer(producerProperties);
-//
-//            cameraProducer.send(topic, "test");
-//            cameraProducer.send(topic, "LOLOLOL", (metadata, exception) ->
-//                    log.info("TOPIC: " + metadata.topic() + " " + metadata.partition() + " " + metadata.offset()));
-//        });
+        String topicImage = configuration.getTopicImage();
+        List<HexGraphConsumerConfig> imageHexGraphConsumerConfigs = configuration.getImageHexGraphConsumerConfigs();
+        int imageConsumerPollTimeout = configuration.getImageConsumerPollTimeout();
+        FileType fileType = configuration.getImageFileType();
+        List<HexGraphProducerConfig> hexHexGraphProducerConfigs = configuration.getHexHexGraphProducerConfigs();
+        String topicHex = configuration.getTopicHex();
+
+        ImageConsumerFactory imageConsumerFactory = new ImageConsumerFactory();
+        List<HexGraphConsumer> imageHexGraphConsumers = imageConsumerFactory.build(imageHexGraphConsumerConfigs);
 
         ActorSystem system = ActorSystem.create("hexGraph");
 
+        HexProducerFactory hexProducerFactory = new HexProducerFactory();
+        List<HexGraphProducer> hexHexGraphProducers = hexProducerFactory.build(hexHexGraphProducerConfigs);
+
+        Reader reader = ReaderFactory.create(fileType);
+
         int consumerId = 0;
-        for (CameraConfigConsumer cameraConfigConsumer : cameraConfigConsumers) {
-            log.info("Consumer is running...");
-            Properties consumerProperties = buildConsumerProperties(cameraConfigConsumer);
-            Consumer cameraConsumer = new CameraConsumer(consumerProperties);
-            ++consumerId;
-
+        for (HexGraphConsumer imageHexGraphConsumer : imageHexGraphConsumers) {
             try {
+                imageHexGraphConsumer.subscribe(topicImage);
+
+                LOGGER.info(imageHexGraphConsumer.name() + " successfully subscribed to " + topicImage);
+
                 ActorRef imageActor = system.actorOf(ImageActor.props(), "imageActor" + consumerId);
+                consumerId++;
+
                 while (true) {
-                    cameraConsumer.subscribe(topic/*, new ConsumerRebalanceListener() {
-                    @Override
-                    public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
-                        log.info(String.format("%s revoked by this consumer.", Arrays.toString(partitions.toArray())));
-                    }
-
-                    @Override
-                    public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
-                        log.info(String.format("%s assigned to this consumer.", Arrays.toString(partitions.toArray())));
-                    }
-                }*/);
-
-                    ConsumerRecords<String, String> records = cameraConsumer.poll(2000);
+                    ConsumerRecords<String, String> records = imageHexGraphConsumer.poll(imageConsumerPollTimeout);
                     for (ConsumerRecord<String, String> record : records) {
-                        // Here we are going to start an actor which spawns multiple actors based on number of threads,
-                        // and get the image from record file which is stored in S3. Each thread get no of pixels / no of threads, and
-                        // have a producer pass hex value of each pixel to kafka topic (hexValue)
-//                        log.info(record.value());
+                        ConsumerValue consumerValue = new ObjectMapper().readValue(record.value(), ConsumerValue.class);
 
-                        FileType fileType = configuration.getFileType();
+                        String imagePath = consumerValue.getPayload();
+                        LOGGER.debug("Image path: " + imagePath);
 
-                        Reader reader = null;
-                        switch (fileType) {
-                            case FILE:
-                                log.info("");
-                                reader = new FileReader();
-                                break;
-                            case S3:
-                                reader = new S3Reader();
-                                break;
-                            default:
-                                // TODO:
-                        }
+                        File imageFile = new File(imagePath);
+                        BufferedImage image = reader.getImage(imageFile);
+                        LocalDateTime imageCreationDate = reader.getCreationDate(imageFile);
+                        HexGraphImage hexGraphImage = new HexGraphImage(imagePath, imageCreationDate);
 
-                        Gson gson = new Gson();
-                        KafkaValue kafkaValue = gson.fromJson(record.value(), KafkaValue.class);
-
-                        try {
-                            BasicFileAttributes attr = Files.readAttributes(new File(kafkaValue.getPayload()).toPath(), BasicFileAttributes.class);
-                            log.info(String.valueOf(attr.creationTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
-                            BufferedImage image = reader.getImage(kafkaValue.getPayload());
-
-                            imageActor.tell(new ImageActor.UpdateImage(image), imageActor);
-                        } catch (IOException e) {
-                            log.info(e.getMessage());
-                        }
+                        imageActor.tell(new ImageActor.UpdateHexGraphImage(hexGraphImage), imageActor);
+                        imageActor.tell(new ImageActor.UpdateImage(image), imageActor);
+                        imageActor.tell(new ImageActor.UpdateProducers(hexHexGraphProducers), imageActor);
+                        imageActor.tell(new ImageActor.UpdateTopic(topicHex), imageActor);
+                        imageActor.tell(UPDATE_PIXEL_COUNTS, imageActor);
                     }
 //                cameraConsumer.commitAsync();
                 }
+            } catch (JsonParseException e) {
+                LOGGER.error(e.getMessage(), e);
+            } catch (JsonMappingException e) {
+                LOGGER.error(e.getMessage(), e);
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
             } finally {
-                cameraConsumer.close();
+                imageHexGraphConsumer.close();
             }
         }
-    }
-
-    private Properties buildProducerProperties(CameraConfigProducer cameraConfigProducer, Map<String, String> partitionConfig) {
-        ProducerPropertiesBuilder producerPropertiesBuilder = new ProducerPropertiesBuilder(cameraConfigProducer.getBootstrapServerConfig(),
-                cameraConfigProducer.getSerializerClassConfig(),
-                cameraConfigProducer.getValueSerializerClassConfig());
-
-        return producerPropertiesBuilder.withPartitionerClassConfig(CameraPartitioner.class.getCanonicalName()).withPartitions(partitionConfig).build();
-    }
-
-    private Properties buildConsumerProperties(CameraConfigConsumer cameraConfigConsumer) {
-        ConsumerPropertiesBuilder consumerPropertiesBuilder = new ConsumerPropertiesBuilder(cameraConfigConsumer.getBootstrapServerConfig(),
-                cameraConfigConsumer.getDeserializerClassConfig(), cameraConfigConsumer.getValueDeserializerClassConfig(),
-                cameraConfigConsumer.getGroupIdConfig()).withAutoOffsetResetConfig(cameraConfigConsumer.getAutoOffsetResetConfig());
-        return consumerPropertiesBuilder.build();
     }
 }

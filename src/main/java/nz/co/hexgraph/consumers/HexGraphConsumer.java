@@ -10,21 +10,21 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 
-public abstract class Consumer extends KafkaConsumer {
+public abstract class HexGraphConsumer extends KafkaConsumer {
 
-    public Consumer(Map configs) {
+    public HexGraphConsumer(Map configs) {
         super(configs);
     }
 
-    public Consumer(Map configs, Deserializer keyDeserializer, Deserializer valueDeserializer) {
+    public HexGraphConsumer(Map configs, Deserializer keyDeserializer, Deserializer valueDeserializer) {
         super(configs, keyDeserializer, valueDeserializer);
     }
 
-    public Consumer(Properties properties) {
+    public HexGraphConsumer(Properties properties) {
         super(properties);
     }
 
-    public Consumer(Properties properties, Deserializer keyDeserializer, Deserializer valueDeserializer) {
+    public HexGraphConsumer(Properties properties, Deserializer keyDeserializer, Deserializer valueDeserializer) {
         super(properties, keyDeserializer, valueDeserializer);
     }
 
@@ -32,5 +32,7 @@ public abstract class Consumer extends KafkaConsumer {
         super.subscribe(Arrays.asList(topic));
     }
 
-    // TODO: Add some abstract methods here later on
+    public abstract String name();
+
+    public abstract String version();
 }

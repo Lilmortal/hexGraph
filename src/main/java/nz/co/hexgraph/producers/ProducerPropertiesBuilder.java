@@ -2,10 +2,16 @@ package nz.co.hexgraph.producers;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 public class ProducerPropertiesBuilder {
+    private static final String DEFAULT_CLIENT_ID_CONFIG = "";
+
+    private static final String DEFAULT_PARTITIONER_CLASS_CONFIG = "org.apache.kafka.clients.producer.internals.DefaultPartitioner";
+
     private Properties properties = new Properties();
 
     public ProducerPropertiesBuilder(String bootstrapServersConfig, String serializerClassConfig, String valueSerializerClassConfig) {
@@ -14,18 +20,13 @@ public class ProducerPropertiesBuilder {
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializerClassConfig);
     }
 
-    public ProducerPropertiesBuilder withClientIdConfig(String clientIdConfig) {
-        properties.put(ProducerConfig.CLIENT_ID_CONFIG, clientIdConfig);
+    public ProducerPropertiesBuilder withClientIdConfig(Optional<String> clientIdConfig) {
+        properties.put(ProducerConfig.CLIENT_ID_CONFIG, clientIdConfig.orElse(DEFAULT_CLIENT_ID_CONFIG));
         return this;
     }
 
-    public ProducerPropertiesBuilder withPartitionerClassConfig(String partitionerClassConfig) {
-        properties.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, partitionerClassConfig);
-        return this;
-    }
-
-    public ProducerPropertiesBuilder withPartitions(Map<String, String> partitions) {
-        partitions.forEach((key, value) -> properties.put(key, value));
+    public ProducerPropertiesBuilder withPartitionerClassConfig(Optional<String> partitionerClassConfig) {
+        properties.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, partitionerClassConfig.orElse(DEFAULT_PARTITIONER_CLASS_CONFIG));
         return this;
     }
 
