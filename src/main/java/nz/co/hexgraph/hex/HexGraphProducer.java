@@ -4,8 +4,8 @@ import nz.co.hexgraph.producers.HexGraphProducer;
 
 import java.util.Properties;
 
-public class HexHexGraphProducer extends HexGraphProducer {
-    public HexHexGraphProducer(Properties properties) {
+public class HexGraphProducer extends nz.co.hexgraph.producers.HexGraphProducer {
+    public HexGraphProducer(Properties properties) {
         super(properties);
     }
 

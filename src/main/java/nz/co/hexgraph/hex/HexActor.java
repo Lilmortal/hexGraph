@@ -75,6 +75,8 @@ public class HexActor extends AbstractActor {
 
                         String hex = String.format("#%02x%02x%02x", red, green, blue);
 
+                        // TODO: Sending message back SLOWS things down to a single thread crawl...
+                        // Find a better way
                         getSender().tell(new ImageActor.UpdateHexValue(hex), getSelf());
                     }
                 }).build();

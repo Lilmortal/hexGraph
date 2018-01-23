@@ -105,9 +105,20 @@ public class ImageActor extends AbstractActor {
                     int numberOfPixelsPerProcessor = getNumberOfPixelsPerProcessor(numberOfPixels);
 
                     // TODO: Test performance compare to just one thread handling all the pixels in an image
+                    // TODO: This is NOT PARRALISM, HOW TO CREATE AN AKKA CLUSTER LOOK IT UP
+                    ActorRef hexActor = getContext().actorSelection("name1");
+                    ActorRef hexActor = getContext().actorSelection("name2");
+                    ActorRef hexActor = getContext().actorSelection("name3");
+                    ActorRef hexActor = getContext().actorSelection("name4");
+                    ActorRef hexActor = getContext().actorSelection("name5");
+
+                    for (int i =0; i < 1000; i++) {
+                        hexActor.tell(0, 10);
+                        hexActor1.tell()
+                    }
                     for (int i = 1; i <= PROCESSORS; i++) {
-                        int pos = numberOfPixelsPerProcessor * i;
                         ActorRef hexActor = getContext().actorOf(HexActor.props());
+                        int pos = numberOfPixelsPerProcessor * i;
                         hexActor.tell(new HexActor.UpdateImage(image), getSelf());
                         hexActor.tell(new HexActor.UpdatePosition(pos - numberOfPixelsPerProcessor, pos), getSelf());
                         hexActor.tell(SEND_HEX_TOPIC_MESSAGE, getSelf());
