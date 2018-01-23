@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -84,10 +85,11 @@ public class ImageActor extends AbstractActor {
                 .match(UpdateImagePath.class, r -> this.imagePath = r.imagePath)
                 .match(UpdateConfiguration.class, r -> this.configuration = r.configuration)
                 .matchEquals(UPDATE_PIXEL_COUNTS, r -> {
-                    Reader reader = ReaderFactory.create(fileType);
+                    FileType imageFileType = configuration.getImageFileType();
+                    Reader reader = ReaderFactory.create(imageFileType);
 
                     BufferedImage image = reader.getImage(imagePath);
-                    this.creationDate = reader.getCreationDate(imagePath);
+                    LocalDateTime imageCreationDate = reader.getCreationDate(imagePath);
 
                     int numberOfPixels = getNumberOfPixels(image);
 
@@ -97,16 +99,6 @@ public class ImageActor extends AbstractActor {
 
                     // TODO: Test performance compare to just one thread handling all the pixels in an image
                     // TODO: This is NOT PARRALISM, HOW TO CREATE AN AKKA CLUSTER LOOK IT UP
-                    ActorRef hexActor = getContext().actorSelection("name1");
-                    ActorRef hexActor = getContext().actorSelection("name2");
-                    ActorRef hexActor = getContext().actorSelection("name3");
-                    ActorRef hexActor = getContext().actorSelection("name4");
-                    ActorRef hexActor = getContext().actorSelection("name5");
-
-                    for (int i =0; i < 1000; i++) {
-                        hexActor.tell(0, 10);
-                        hexActor1.tell()
-                    }
                     for (int i = 1; i <= PROCESSORS; i++) {
                         ActorRef hexActor = getContext().actorOf(HexActor.props());
                         int pos = numberOfPixelsPerProcessor * i;
