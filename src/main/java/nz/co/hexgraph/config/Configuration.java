@@ -1,20 +1,18 @@
 package nz.co.hexgraph.config;
 
 import nz.co.hexgraph.consumers.HexGraphConsumerConfig;
-import nz.co.hexgraph.producers.HexGraphProducerConfig;
-
-import java.util.List;
+import nz.co.hexgraph.producer.HexGraphProducerConfig;
 
 public interface Configuration {
-    String getTopicImage();
+    String getTopicImages();
 
-    String getTopicHex();
+    String getTopicHexValue();
 
     FileType getImageFileType();
 
-    List<HexGraphProducerConfig> getHexGraphProducerConfigs();
+    HexGraphProducerConfig getHexValueProducerConfig();
 
-    List<HexGraphConsumerConfig> getHexGraphConsumerConfigs();
+    HexGraphConsumerConfig getImagesConsumerConfig();
 
     int getImageConsumerPollTimeout();
 }

@@ -1,4 +1,4 @@
-package nz.co.hexgraph.hex;
+package nz.co.hexgraph.hexvalue;
 
 import akka.actor.AbstractActor;
 import akka.actor.Props;
@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 
-import static nz.co.hexgraph.hex.HexActor.Message.SEND_HEX_TOPIC_MESSAGE;
+import static nz.co.hexgraph.hexvalue.HexActor.Message.SEND_HEX_TOPIC_MESSAGE;
 
 public class HexActor extends AbstractActor {
     public static final Logger LOGGER = LoggerFactory.getLogger(HexActor.class);

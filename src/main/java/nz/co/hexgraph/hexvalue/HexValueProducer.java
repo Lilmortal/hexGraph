@@ -1,11 +1,11 @@
-package nz.co.hexgraph.hex;
+package nz.co.hexgraph.hexvalue;
 
-import nz.co.hexgraph.producers.HexGraphProducer;
+import nz.co.hexgraph.producer.HexGraphProducer;
 
 import java.util.Properties;
 
-public class HexGraphProducer extends nz.co.hexgraph.producers.HexGraphProducer {
-    public HexGraphProducer(Properties properties) {
+public class HexValueProducer extends HexGraphProducer {
+    public HexValueProducer(Properties properties) {
         super(properties);
     }
 

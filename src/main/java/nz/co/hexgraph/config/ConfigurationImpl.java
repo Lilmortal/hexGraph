@@ -1,36 +1,34 @@
 package nz.co.hexgraph.config;
 
 import nz.co.hexgraph.consumers.HexGraphConsumerConfig;
-import nz.co.hexgraph.producers.HexGraphProducerConfig;
-
-import java.util.List;
+import nz.co.hexgraph.producer.HexGraphProducerConfig;
 
 public class ConfigurationImpl implements Configuration {
     ConfigurationSingleton configurationSingleton = ConfigurationSingleton.getInstance();
 
     @Override
-    public String getTopicImage() {
-        return configurationSingleton.getTopicImage();
+    public String getTopicImages() {
+        return configurationSingleton.getTopicImages();
     }
 
     @Override
-    public String getTopicHex() {
-        return configurationSingleton.getTopicHex();
+    public String getTopicHexValue() {
+        return configurationSingleton.getTopicHexValue();
     }
 
     @Override
     public FileType getImageFileType() {
-        return configurationSingleton.getImageFileType();
+        return configurationSingleton.getImagesFileType();
     }
 
     @Override
-    public List<HexGraphProducerConfig> getHexGraphProducerConfigs() {
-        return configurationSingleton.getHexGraphProducerConfigs();
+    public HexGraphProducerConfig getHexValueProducerConfig() {
+        return configurationSingleton.getHexValueProducerConfig();
     }
 
     @Override
-    public List<HexGraphConsumerConfig> getHexGraphConsumerConfigs() {
-        return configurationSingleton.getHexGraphConsumerConfigs();
+    public HexGraphConsumerConfig getImagesConsumerConfig() {
+        return configurationSingleton.getImagesConsumerConfig();
     }
 
     @Override

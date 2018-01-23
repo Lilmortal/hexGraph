@@ -1,14 +1,13 @@
 package nz.co.hexgraph.config;
 
 import nz.co.hexgraph.consumers.HexGraphConsumerConfig;
-import nz.co.hexgraph.producers.HexGraphProducerConfig;
+import nz.co.hexgraph.producer.HexGraphProducerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.List;
 
 /**
  * A POJO reading from config files.
@@ -20,39 +19,39 @@ public class ConfigurationSingleton {
 
     private static final String CONFIG_NAME = "config.properties";
 
-    private static final String TOPIC_IMAGE_CONFIG_NAME = "topic.image";
+    private static final String TOPIC_IMAGES_CONFIG_NAME = "topic.images";
 
-    private static final String TOPIC_HEX_CONFIG_NAME = "topic.hex";
+    private static final String TOPIC_HEX_VALUE_CONFIG_NAME = "topic.hex.value";
 
-    private static final String IMAGE_FILE_TYPE_CONFIG_NAME = "image.file.type";
+    private static final String IMAGES_FILE_TYPE_CONFIG_NAME = "images.file.type";
 
-    private static final String HEX_PRODUCER_BOOTSTRAP_SERVER_CONFIG_NAME = "hex.producer.%s.bootstrapServerConfig";
+    private static final String HEX_VALUE_PRODUCER_BOOTSTRAP_SERVER_CONFIG_NAME = "hex.value.producer.bootstrapServerConfig";
 
-    private static final String HEX_PRODUCER_SERIALIZER_CLASS_CONFIG_NAME = "hex.producer.%s.serializerClassConfig";
+    private static final String HEX_VALUE_PRODUCER_SERIALIZER_CLASS_CONFIG_NAME = "hex.value.producer.serializerClassConfig";
 
-    private static final String HEX_PRODUCER_VALUE_SERIALIZER_CLASS_CONFIG_NAME = "hex.producer.%s.valueSerializerClassConfig";
+    private static final String HEX_VALUE_PRODUCER_VALUE_SERIALIZER_CLASS_CONFIG_NAME = "hex.value.producer.valueSerializerClassConfig";
 
-    private static final String IMAGE_CONSUMER_BOOTSTRAP_SERVER_CONFIG_NAME = "image.consumer.%s.bootstrapServerConfig";
+    private static final String IMAGES_CONSUMER_BOOTSTRAP_SERVER_CONFIG_NAME = "images.consumer.bootstrapServerConfig";
 
-    private static final String IMAGE_CONSUMER_DESERIALIZER_CLASS_CONFIG_NAME = "image.consumer.%s.deserializerClassConfig";
+    private static final String IMAGES_CONSUMER_DESERIALIZER_CLASS_CONFIG_NAME = "images.consumer.deserializerClassConfig";
 
-    private static final String IMAGE_CONSUMER_VALUE_DESERIALIZER_CLASS_CONFIG_NAME = "image.consumer.%s.valueDeserializerClassConfig";
+    private static final String IMAGES_CONSUMER_VALUE_DESERIALIZER_CLASS_CONFIG_NAME = "images.consumer.valueDeserializerClassConfig";
 
-    private static final String IMAGE_CONSUMER_GROUP_ID_CONFIG_NAME = "image.consumer.%s.groupIdConfig";
+    private static final String IMAGES_CONSUMER_GROUP_ID_CONFIG_NAME = "images.consumer.groupIdConfig";
 
-    private static final String IMAGE_CONSUMER_AUTO_OFFSET_RESET_CONFIG_NAME = "image.consumer.%s.autoOffsetResetConfig";
+    private static final String IMAGES_CONSUMER_AUTO_OFFSET_RESET_CONFIG_NAME = "images.consumer.autoOffsetResetConfig";
 
-    private static final String IMAGE_CONSUMER_POLL_TIMEOUT_CONFIG_NAME = "image.consumer.poll.timeout";
+    private static final String IMAGES_CONSUMER_POLL_TIMEOUT_CONFIG_NAME = "images.consumer.poll.timeout";
 
-    private String topicImage;
+    private String topicImages;
 
-    private String topicHex;
+    private String topicHexValue;
 
-    private FileType imageFileType;
+    private FileType imagesFileType;
 
-    private List<HexGraphProducerConfig> hexGraphProducerConfigs = new ArrayList<>();
+    private HexGraphProducerConfig hexValueProducerConfig;
 
-    private List<HexGraphConsumerConfig> hexGraphConsumerConfigs = new ArrayList<>();
+    private HexGraphConsumerConfig imagesConsumerConfig;
 
     private int imageConsumerPollTimeout;
 
@@ -64,36 +63,26 @@ public class ConfigurationSingleton {
             LOG.error(e.getMessage());
         }
 
-        topicImage = properties.getProperty(TOPIC_IMAGE_CONFIG_NAME);
-        topicHex = properties.getProperty(TOPIC_HEX_CONFIG_NAME);
-        imageFileType = FileType.valueOf(properties.getProperty(IMAGE_FILE_TYPE_CONFIG_NAME).toUpperCase());
+        topicImages = properties.getProperty(TOPIC_IMAGES_CONFIG_NAME);
+        topicHexValue = properties.getProperty(TOPIC_HEX_VALUE_CONFIG_NAME);
+        imagesFileType = FileType.valueOf(properties.getProperty(IMAGES_FILE_TYPE_CONFIG_NAME).toUpperCase());
 
-        int i = 0;
-        while (properties.getProperty(String.format(HEX_PRODUCER_BOOTSTRAP_SERVER_CONFIG_NAME, i)) != null) {
-            String cameraProducerBootstrapServerConfig = properties.getProperty(String.format(HEX_PRODUCER_BOOTSTRAP_SERVER_CONFIG_NAME, i));
-            String cameraProducerSerializerClassConfig = properties.getProperty(String.format(HEX_PRODUCER_SERIALIZER_CLASS_CONFIG_NAME, i));
-            String cameraProducerValueSerializerClassConfig = properties.getProperty(String.format(HEX_PRODUCER_VALUE_SERIALIZER_CLASS_CONFIG_NAME, i));
-            HexGraphProducerConfig hexHexGraphProducerConfig = new HexGraphProducerConfig(cameraProducerBootstrapServerConfig, cameraProducerSerializerClassConfig,
-                    cameraProducerValueSerializerClassConfig);
-            hexGraphProducerConfigs.add(hexHexGraphProducerConfig);
-            i++;
-        }
+        String cameraProducerBootstrapServerConfig = properties.getProperty(HEX_VALUE_PRODUCER_BOOTSTRAP_SERVER_CONFIG_NAME);
+        String cameraProducerSerializerClassConfig = properties.getProperty(HEX_VALUE_PRODUCER_SERIALIZER_CLASS_CONFIG_NAME);
+        String cameraProducerValueSerializerClassConfig = properties.getProperty(HEX_VALUE_PRODUCER_VALUE_SERIALIZER_CLASS_CONFIG_NAME);
+        hexValueProducerConfig = new HexGraphProducerConfig(cameraProducerBootstrapServerConfig, cameraProducerSerializerClassConfig,
+                cameraProducerValueSerializerClassConfig);
 
-        i = 0;
-        while (properties.getProperty(String.format(IMAGE_CONSUMER_BOOTSTRAP_SERVER_CONFIG_NAME, i)) != null) {
-            String cameraConsumerBootstrapServerConfig = properties.getProperty(String.format(IMAGE_CONSUMER_BOOTSTRAP_SERVER_CONFIG_NAME, i));
-            String cameraConsumerDeserializerClassConfig = properties.getProperty(String.format(IMAGE_CONSUMER_DESERIALIZER_CLASS_CONFIG_NAME, i));
-            String cameraConsumerValueDeserializerClassConfig = properties.getProperty(String.format(IMAGE_CONSUMER_VALUE_DESERIALIZER_CLASS_CONFIG_NAME, i));
-            String cameraConsumerGroupIdConfig = properties.getProperty(String.format(IMAGE_CONSUMER_GROUP_ID_CONFIG_NAME, i));
-            String cameraConsumerAutoOffsetResetConfig = properties.getProperty(String.format(IMAGE_CONSUMER_AUTO_OFFSET_RESET_CONFIG_NAME, i));
-            HexGraphConsumerConfig imageHexGraphConsumerConfig = new HexGraphConsumerConfig(cameraConsumerBootstrapServerConfig,
-                    cameraConsumerDeserializerClassConfig, cameraConsumerValueDeserializerClassConfig,
-                    cameraConsumerGroupIdConfig, cameraConsumerAutoOffsetResetConfig);
-            hexGraphConsumerConfigs.add(imageHexGraphConsumerConfig);
-            i++;
-        }
+        String cameraConsumerBootstrapServerConfig = properties.getProperty(IMAGES_CONSUMER_BOOTSTRAP_SERVER_CONFIG_NAME);
+        String cameraConsumerDeserializerClassConfig = properties.getProperty(IMAGES_CONSUMER_DESERIALIZER_CLASS_CONFIG_NAME);
+        String cameraConsumerValueDeserializerClassConfig = properties.getProperty(IMAGES_CONSUMER_VALUE_DESERIALIZER_CLASS_CONFIG_NAME);
+        String cameraConsumerGroupIdConfig = properties.getProperty(IMAGES_CONSUMER_GROUP_ID_CONFIG_NAME);
+        String cameraConsumerAutoOffsetResetConfig = properties.getProperty(IMAGES_CONSUMER_AUTO_OFFSET_RESET_CONFIG_NAME);
+        imagesConsumerConfig = new HexGraphConsumerConfig(cameraConsumerBootstrapServerConfig,
+                cameraConsumerDeserializerClassConfig, cameraConsumerValueDeserializerClassConfig,
+                cameraConsumerGroupIdConfig, cameraConsumerAutoOffsetResetConfig);
 
-        imageConsumerPollTimeout = Integer.parseInt(properties.getProperty(IMAGE_CONSUMER_POLL_TIMEOUT_CONFIG_NAME));
+        imageConsumerPollTimeout = Integer.parseInt(properties.getProperty(IMAGES_CONSUMER_POLL_TIMEOUT_CONFIG_NAME));
     }
 
     private static class SingletonHelper {
@@ -104,24 +93,24 @@ public class ConfigurationSingleton {
         return SingletonHelper.INSTANCE;
     }
 
-    public String getTopicImage() {
-        return topicImage;
+    public String getTopicImages() {
+        return topicImages;
     }
 
-    public String getTopicHex() {
-        return topicHex;
+    public String getTopicHexValue() {
+        return topicHexValue;
     }
 
-    public FileType getImageFileType() {
-        return imageFileType;
+    public FileType getImagesFileType() {
+        return imagesFileType;
     }
 
-    public List<HexGraphProducerConfig> getHexGraphProducerConfigs() {
-        return hexGraphProducerConfigs;
+    public HexGraphProducerConfig getHexValueProducerConfig() {
+        return hexValueProducerConfig;
     }
 
-    public List<HexGraphConsumerConfig> getHexGraphConsumerConfigs() {
-        return hexGraphConsumerConfigs;
+    public HexGraphConsumerConfig getImagesConsumerConfig() {
+        return imagesConsumerConfig;
     }
 
     public int getImageConsumerPollTimeout() {

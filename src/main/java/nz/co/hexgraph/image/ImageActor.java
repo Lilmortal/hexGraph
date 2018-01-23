@@ -4,9 +4,10 @@ import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nz.co.hexgraph.config.Configuration;
 import nz.co.hexgraph.config.FileType;
-import nz.co.hexgraph.hex.HexActor;
-import nz.co.hexgraph.producers.HexGraphProducer;
+import nz.co.hexgraph.hexvalue.HexActor;
+import nz.co.hexgraph.producer.HexGraphProducer;
 import nz.co.hexgraph.reader.Reader;
 import nz.co.hexgraph.reader.ReaderFactory;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -14,12 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static nz.co.hexgraph.hex.HexActor.Message.SEND_HEX_TOPIC_MESSAGE;
-import static nz.co.hexgraph.hex.HexActor.Message.TOPIC_MESSAGE_SENT;
+import static nz.co.hexgraph.hexvalue.HexActor.Message.SEND_HEX_TOPIC_MESSAGE;
 import static nz.co.hexgraph.image.ImageActor.MESSAGE.UPDATE_PIXEL_COUNTS;
 
 public class ImageActor extends AbstractActor {
@@ -29,13 +28,7 @@ public class ImageActor extends AbstractActor {
 
     private String imagePath;
 
-    private FileType fileType;
-
-    private LocalDateTime creationDate;
-
-    private List<HexGraphProducer> hexGraphProducers;
-
-    private String topic;
+    private Configuration configuration;
 
     public static Props props() {
         return Props.create(ImageActor.class);
@@ -53,11 +46,11 @@ public class ImageActor extends AbstractActor {
         }
     }
 
-    public static class UpdateFileType {
-        private FileType fileType;
+    public static class UpdateConfiguration {
+        private Configuration configuration;
 
-        public UpdateFileType(FileType fileType) {
-            this.fileType = fileType;
+        public UpdateConfiguration(Configuration configuration) {
+            this.configuration = configuration;
         }
     }
 
@@ -89,9 +82,7 @@ public class ImageActor extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(UpdateImagePath.class, r -> this.imagePath = r.imagePath)
-                .match(UpdateFileType.class, r -> this.fileType = r.fileType)
-                .match(UpdateProducers.class, r -> this.hexGraphProducers = r.hexGraphProducers)
-                .match(UpdateTopic.class, r -> this.topic = r.topic)
+                .match(UpdateConfiguration.class, r -> this.configuration = r.configuration)
                 .matchEquals(UPDATE_PIXEL_COUNTS, r -> {
                     Reader reader = ReaderFactory.create(fileType);
 
