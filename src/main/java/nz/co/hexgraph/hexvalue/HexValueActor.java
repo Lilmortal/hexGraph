@@ -83,7 +83,7 @@ public class HexValueActor extends AbstractActor {
                     byte[] hexValueBytes = new ObjectMapper().writeValueAsBytes(hexValueMessage);
 
                     String hexValueTopic = configuration.getTopicHexValue();
-                    ProducerRecord<String, byte[]> hexValueProducerRecord = new ProducerRecord<>(hexValueTopic, hexValueBytes);
+                    ProducerRecord<String, byte[]> hexValueProducerRecord = new ProducerRecord<>(hexValueTopic, hexValueMessage.getCreationDate().toString(), hexValueBytes);
                     hexValueProducer.send(hexValueProducerRecord);
                 }).build();
 
