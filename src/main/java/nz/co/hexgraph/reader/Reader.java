@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public interface Reader {
-    BufferedImage getImage(File file) throws IOException;
+    BufferedImage getImage(String imagePath) throws IOException;
 
-    LocalDateTime getCreationDate(File file) throws IOException;
+    LocalDateTime getCreationDate(String imagePath) throws IOException;
 }

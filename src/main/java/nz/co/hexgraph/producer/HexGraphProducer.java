@@ -1,4 +1,4 @@
-package nz.co.hexgraph.producers;
+package nz.co.hexgraph.producer;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.serialization.Serializer;

@@ -1,4 +1,4 @@
-package nz.co.hexgraph.producers;
+package nz.co.hexgraph.producer;
 
 public class HexGraphProducerConfig {
     private String bootstrapServerConfig;

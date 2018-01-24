@@ -1,9 +1,7 @@
-package nz.co.hexgraph.producers;
+package nz.co.hexgraph.producer;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 

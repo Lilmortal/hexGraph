@@ -8,12 +8,12 @@ import java.time.LocalDateTime;
 public class S3Reader implements Reader {
 
     @Override
-    public BufferedImage getImage(File file) throws IOException {
+    public BufferedImage getImage(String imagePath) throws IOException {
         return null;
     }
 
     @Override
-    public LocalDateTime getCreationDate(File file) throws IOException {
+    public LocalDateTime getCreationDate(String imagePath) throws IOException {
         return null;
     }
 }

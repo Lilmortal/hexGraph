@@ -4,8 +4,8 @@ import nz.co.hexgraph.consumers.HexGraphConsumer;
 
 import java.util.Properties;
 
-public class ImageHexGraphConsumer extends HexGraphConsumer {
-    public ImageHexGraphConsumer(Properties properties) {
+public class ImagesConsumer extends HexGraphConsumer {
+    public ImagesConsumer(Properties properties) {
         super(properties);
     }
 

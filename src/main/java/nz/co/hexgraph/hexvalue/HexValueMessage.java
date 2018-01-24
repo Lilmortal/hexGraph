@@ -1,15 +1,18 @@
-package nz.co.hexgraph.image;
+package nz.co.hexgraph.hexvalue;
 
-import java.awt.image.BufferedImage;
 import java.time.LocalDateTime;
 
-public class HexGraphImage {
+public class HexValueMessage {
     private String imagePath;
+
     private LocalDateTime creationDate;
 
-    public HexGraphImage(String imagePath, LocalDateTime creationDate) {
+    private String hexValue;
+
+    public HexValueMessage(String imagePath, LocalDateTime creationDate, String hexValue) {
         this.imagePath = imagePath;
         this.creationDate = creationDate;
+        this.hexValue = hexValue;
     }
 
     public String getImagePath() {
@@ -20,11 +23,16 @@ public class HexGraphImage {
         return creationDate;
     }
 
+    public String getHexValue() {
+        return hexValue;
+    }
+
     @Override
     public String toString() {
-        return "HexGraphImage{" +
+        return "HexValueMessage{" +
                 "imagePath='" + imagePath + '\'' +
                 ", creationDate=" + creationDate +
+                ", hexValue='" + hexValue + '\'' +
                 '}';
     }
 }
