@@ -1,29 +1,28 @@
-package nz.co.hexgraph.hexvalue;
+package nz.co.hexgraph.hexcode;
 
 import akka.actor.AbstractActor;
 import akka.actor.Props;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.co.hexgraph.config.Configuration;
-import nz.co.hexgraph.producer.HexGraphProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static nz.co.hexgraph.hexvalue.HexValueActor.Message.SEND_HEX_TOPIC_MESSAGE;
+import static nz.co.hexgraph.hexcode.HexCodeActor.Message.SEND_HEX_TOPIC_MESSAGE;
 
-public class HexValueActor extends AbstractActor {
-    public static final Logger LOGGER = LoggerFactory.getLogger(HexValueActor.class);
+public class HexCodeActor extends AbstractActor {
+    public static final Logger LOGGER = LoggerFactory.getLogger(HexCodeActor.class);
 
     private Configuration configuration;
 
-    private HexValueProducer hexValueProducer;
+    private HexCodeProducer hexCodeProducer;
 
-    private HexValueMessageBuilder hexValueMessageBuilder;
+    private HexCodeMessageBuilder hexCodeMessageBuilder;
 
     private int rgb;
 
     public static Props props() {
-        return Props.create(HexValueActor.class);
+        return Props.create(HexCodeActor.class);
     }
 
     public static class UpdateConfiguration {
@@ -34,20 +33,20 @@ public class HexValueActor extends AbstractActor {
         }
     }
 
-    public static class UpdateHexValueProducer {
-        private HexValueProducer hexValueProducer;
+    public static class UpdateHexCodeProducer {
+        private HexCodeProducer hexCodeProducer;
 
-        public UpdateHexValueProducer(HexValueProducer hexValueProducer) {
-            this.hexValueProducer = hexValueProducer;
+        public UpdateHexCodeProducer(HexCodeProducer hexCodeProducer) {
+            this.hexCodeProducer = hexCodeProducer;
         }
     }
 
 
-    public static class UpdateHexValueMessageBuilder {
-        private HexValueMessageBuilder hexValueMessageBuilder;
+    public static class UpdateHexCodeMessageBuilder {
+        private HexCodeMessageBuilder hexCodeMessageBuilder;
 
-        public UpdateHexValueMessageBuilder(HexValueMessageBuilder hexValueMessageBuilder) {
-            this.hexValueMessageBuilder = hexValueMessageBuilder;
+        public UpdateHexCodeMessageBuilder(HexCodeMessageBuilder hexCodeMessageBuilder) {
+            this.hexCodeMessageBuilder = hexCodeMessageBuilder;
         }
     }
 
@@ -60,16 +59,15 @@ public class HexValueActor extends AbstractActor {
     }
 
     public enum Message {
-        SEND_HEX_TOPIC_MESSAGE,
-        TOPIC_MESSAGE_SENT
+        SEND_HEX_TOPIC_MESSAGE
     }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
                 .match(UpdateConfiguration.class, r -> this.configuration = r.configuration)
-                .match(UpdateHexValueProducer.class, r -> this.hexValueProducer = r.hexValueProducer)
-                .match(UpdateHexValueMessageBuilder.class, r -> this.hexValueMessageBuilder = r.hexValueMessageBuilder)
+                .match(UpdateHexCodeProducer.class, r -> this.hexCodeProducer = r.hexCodeProducer)
+                .match(UpdateHexCodeMessageBuilder.class, r -> this.hexCodeMessageBuilder = r.hexCodeMessageBuilder)
                 .match(UpdateRgb.class, r -> this.rgb = r.rgb)
                 .matchEquals(SEND_HEX_TOPIC_MESSAGE, r -> {
                     int red = getRedValue(rgb);
@@ -79,12 +77,12 @@ public class HexValueActor extends AbstractActor {
                     String hexValue = String.format("#%02x%02x%02x", red, green, blue);
 
                     LOGGER.info(hexValue);
-                    HexValueMessage hexValueMessage = hexValueMessageBuilder.withHexValue(hexValue).build();
-                    byte[] hexValueBytes = new ObjectMapper().writeValueAsBytes(hexValueMessage);
+                    HexCodeMessage hexCodeMessage = hexCodeMessageBuilder.withHexValue(hexValue).build();
+                    byte[] hexValueBytes = new ObjectMapper().writeValueAsBytes(hexCodeMessage.getHexCodeMessageValue());
 
                     String hexValueTopic = configuration.getTopicHexValue();
-                    ProducerRecord<String, byte[]> hexValueProducerRecord = new ProducerRecord<>(hexValueTopic, hexValueMessage.getCreationDate().toString(), hexValueBytes);
-                    hexValueProducer.send(hexValueProducerRecord);
+                    ProducerRecord<String, byte[]> hexValueProducerRecord = new ProducerRecord<>(hexValueTopic, hexCodeMessage.getImagePath(), hexValueBytes);
+                    hexCodeProducer.send(hexValueProducerRecord);
                 }).build();
 
     }

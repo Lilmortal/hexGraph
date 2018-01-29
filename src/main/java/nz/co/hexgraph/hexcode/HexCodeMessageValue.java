@@ -1,22 +1,15 @@
-package nz.co.hexgraph.hexvalue;
+package nz.co.hexgraph.hexcode;
 
 import java.time.LocalDateTime;
 
-public class HexValueMessage {
-    private String imagePath;
-
+public class HexCodeMessageValue {
     private LocalDateTime creationDate;
 
     private String hexValue;
 
-    public HexValueMessage(String imagePath, LocalDateTime creationDate, String hexValue) {
-        this.imagePath = imagePath;
+    public HexCodeMessageValue(LocalDateTime creationDate, String hexValue) {
         this.creationDate = creationDate;
         this.hexValue = hexValue;
-    }
-
-    public String getImagePath() {
-        return imagePath;
     }
 
     public LocalDateTime getCreationDate() {
@@ -29,9 +22,8 @@ public class HexValueMessage {
 
     @Override
     public String toString() {
-        return "HexValueMessage{" +
-                "imagePath='" + imagePath + '\'' +
-                ", creationDate=" + creationDate +
+        return "HexCodeMessageValue{" +
+                "creationDate=" + creationDate +
                 ", hexValue='" + hexValue + '\'' +
                 '}';
     }

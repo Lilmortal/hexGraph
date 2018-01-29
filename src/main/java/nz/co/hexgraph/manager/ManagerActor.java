@@ -13,7 +13,7 @@ import nz.co.hexgraph.config.Configuration;
 import nz.co.hexgraph.consumers.ConsumerPropertiesBuilder;
 import nz.co.hexgraph.consumers.ConsumerValue;
 import nz.co.hexgraph.consumers.HexGraphConsumerConfig;
-import nz.co.hexgraph.hexvalue.HexValueProducer;
+import nz.co.hexgraph.hexcode.HexCodeProducer;
 import nz.co.hexgraph.image.ImageActor;
 import nz.co.hexgraph.image.ImagesConsumer;
 import nz.co.hexgraph.producer.HexGraphProducerConfig;
@@ -74,7 +74,7 @@ public class ManagerActor extends AbstractActor {
                     ImagesConsumer imagesConsumer = buildImagesConsumer(imagesConsumerConfig);
 
                     HexGraphProducerConfig hexValueProducerConfig = configuration.getHexValueProducerConfig();
-                    HexValueProducer hexValueProducer = buildHexValueProducer(hexValueProducerConfig);
+                    HexCodeProducer hexCodeProducer = buildHexValueProducer(hexValueProducerConfig);
 
                     String topicImages = configuration.getTopicImages();
                     imagesConsumer.subscribe(topicImages);
@@ -95,7 +95,7 @@ public class ManagerActor extends AbstractActor {
                             // without affecting others? This is more easier to modify.
                             router.route(new ImageActor.UpdateImagePath(imagePath), getSender());
                             router.route(new ImageActor.UpdateConfiguration(configuration), getSender());
-                            router.route(new ImageActor.UpdateHexValueProducer(hexValueProducer), getSender());
+                            router.route(new ImageActor.UpdateHexValueProducer(hexCodeProducer), getSender());
                             router.route(UPDATE_PIXEL_COUNTS, getSender());
                         }
 //                cameraConsumer.commitAsync();
@@ -116,10 +116,10 @@ public class ManagerActor extends AbstractActor {
         return consumerPropertiesBuilder.build();
     }
 
-    private HexValueProducer buildHexValueProducer(HexGraphProducerConfig hexValueProducerConfig) {
+    private HexCodeProducer buildHexValueProducer(HexGraphProducerConfig hexValueProducerConfig) {
         Properties producerProperties = buildProducerProperties(hexValueProducerConfig);
-        HexValueProducer hexValueProducer = new HexValueProducer(producerProperties);
-        return hexValueProducer;
+        HexCodeProducer hexCodeProducer = new HexCodeProducer(producerProperties);
+        return hexCodeProducer;
     }
 
     private Properties buildProducerProperties(HexGraphProducerConfig hexValueProducerConfig) {
