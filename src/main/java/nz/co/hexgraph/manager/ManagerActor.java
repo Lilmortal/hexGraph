@@ -20,6 +20,7 @@ import nz.co.hexgraph.producer.HexGraphProducerConfig;
 import nz.co.hexgraph.producer.ProducerPropertiesBuilder;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.common.errors.WakeupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,35 +71,42 @@ public class ManagerActor extends AbstractActor {
         return receiveBuilder()
                 .match(UpdateConfiguration.class, r -> this.configuration = r.configuration)
                 .matchEquals(MESSAGE.START, r -> {
-                    HexGraphConsumerConfig imagesConsumerConfig = configuration.getImagesConsumerConfig();
-                    ImagesConsumer imagesConsumer = buildImagesConsumer(imagesConsumerConfig);
+                    ImagesConsumer imagesConsumer = null;
+                    try {
+                        HexGraphConsumerConfig imagesConsumerConfig = configuration.getImagesConsumerConfig();
+                        imagesConsumer = buildImagesConsumer(imagesConsumerConfig);
 
-                    HexGraphProducerConfig hexValueProducerConfig = configuration.getHexValueProducerConfig();
-                    HexCodeProducer hexCodeProducer = buildHexValueProducer(hexValueProducerConfig);
+                        HexGraphProducerConfig hexValueProducerConfig = configuration.getHexValueProducerConfig();
+                        HexCodeProducer hexCodeProducer = buildHexValueProducer(hexValueProducerConfig);
 
-                    String topicImages = configuration.getTopicImages();
-                    imagesConsumer.subscribe(topicImages);
+                        String topicImages = configuration.getTopicImages();
+                        imagesConsumer.subscribe(topicImages);
 
-                    LOGGER.info(imagesConsumer.name() + " successfully subscribed to " + topicImages);
+                        LOGGER.info(imagesConsumer.name() + " successfully subscribed to " + topicImages);
 
-                    int imageConsumerPollTimeout = configuration.getImageConsumerPollTimeout();
+                        int imageConsumerPollTimeout = configuration.getImageConsumerPollTimeout();
 
-                    while (true) {
-                        ConsumerRecords<String, String> records = imagesConsumer.poll(imageConsumerPollTimeout);
-                        for (ConsumerRecord<String, String> record : records) {
-                            ConsumerValue consumerValue = new ObjectMapper().readValue(record.value(), ConsumerValue.class);
+                        while (true) {
+                            ConsumerRecords<String, String> records = imagesConsumer.poll(imageConsumerPollTimeout);
+                            for (ConsumerRecord<String, String> record : records) {
+                                ConsumerValue consumerValue = new ObjectMapper().readValue(record.value(), ConsumerValue.class);
 
-                            String imagePath = consumerValue.getPayload();
-                            LOGGER.debug("Image path: " + imagePath);
+                                String imagePath = consumerValue.getPayload();
+                                LOGGER.debug("Image path: " + imagePath);
 
-                            // TODO: Yes we send more messages meaning more delay BUT what if we want to update Configuration
-                            // without affecting others? This is more easier to modify.
-                            router.route(new ImageActor.UpdateImagePath(imagePath), getSender());
-                            router.route(new ImageActor.UpdateConfiguration(configuration), getSender());
-                            router.route(new ImageActor.UpdateHexValueProducer(hexCodeProducer), getSender());
-                            router.route(UPDATE_PIXEL_COUNTS, getSender());
-                        }
+                                // TODO: Yes we send more messages meaning more delay BUT what if we want to update Configuration
+                                // without affecting others? This is more easier to modify.
+                                router.route(new ImageActor.UpdateImagePath(imagePath), getSender());
+                                router.route(new ImageActor.UpdateConfiguration(configuration), getSender());
+                                router.route(new ImageActor.UpdateHexValueProducer(hexCodeProducer), getSender());
+                                router.route(UPDATE_PIXEL_COUNTS, getSender());
+                            }
 //                cameraConsumer.commitAsync();
+                        }
+                    } catch (WakeupException e) {
+                        LOGGER.info("Consumer has been woken up.");
+                    } finally {
+                        imagesConsumer.close();
                     }
                 }).build();
     }
