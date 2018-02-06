@@ -1,14 +1,11 @@
 package nz.co.hexgraph.hexcode;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-
 public class HexCodeMessageBuilder {
     private String imagePath;
 
     private String creationDate;
 
-    private String hexValue;
+    private String hexCode;
 
     public HexCodeMessageBuilder withImagePath(String imagePath) {
         this.imagePath = imagePath;
@@ -20,13 +17,13 @@ public class HexCodeMessageBuilder {
         return this;
     }
 
-    public HexCodeMessageBuilder withHexValue(String hexValue) {
-        this.hexValue = hexValue;
+    public HexCodeMessageBuilder withHexCode(String hexCode) {
+        this.hexCode = hexCode;
         return this;
     }
 
     public HexCodeMessage build() {
-        HexCodeMessageValue hexCodeMessageValue = new HexCodeMessageValue(creationDate, hexValue);
+        HexCodeMessageValue hexCodeMessageValue = new HexCodeMessageValue(creationDate, hexCode);
         return new HexCodeMessage(imagePath, hexCodeMessageValue);
     }
 }

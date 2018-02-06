@@ -21,15 +21,15 @@ public class ConfigurationSingleton {
 
     private static final String TOPIC_IMAGES_CONFIG_NAME = "topic.images";
 
-    private static final String TOPIC_HEX_VALUE_CONFIG_NAME = "topic.hex.value";
+    private static final String TOPIC_HEX_CODE_CONFIG_NAME = "topic.hex.code";
 
     private static final String IMAGES_FILE_TYPE_CONFIG_NAME = "images.file.type";
 
-    private static final String HEX_VALUE_PRODUCER_BOOTSTRAP_SERVER_CONFIG_NAME = "hex.value.producer.bootstrapServerConfig";
+    private static final String HEX_CODE_PRODUCER_BOOTSTRAP_SERVER_CONFIG_NAME = "hex.code.producer.bootstrapServerConfig";
 
-    private static final String HEX_VALUE_PRODUCER_SERIALIZER_CLASS_CONFIG_NAME = "hex.value.producer.serializerClassConfig";
+    private static final String HEX_CODE_PRODUCER_SERIALIZER_CLASS_CONFIG_NAME = "hex.code.producer.serializerClassConfig";
 
-    private static final String HEX_VALUE_PRODUCER_VALUE_SERIALIZER_CLASS_CONFIG_NAME = "hex.value.producer.valueSerializerClassConfig";
+    private static final String HEX_CODE_PRODUCER_VALUE_SERIALIZER_CLASS_CONFIG_NAME = "hex.code.producer.valueSerializerClassConfig";
 
     private static final String IMAGES_CONSUMER_BOOTSTRAP_SERVER_CONFIG_NAME = "images.consumer.bootstrapServerConfig";
 
@@ -45,11 +45,11 @@ public class ConfigurationSingleton {
 
     private String topicImages;
 
-    private String topicHexValue;
+    private String topicHexCode;
 
     private FileType imagesFileType;
 
-    private HexGraphProducerConfig hexValueProducerConfig;
+    private HexGraphProducerConfig hexCodeProducerConfig;
 
     private HexGraphConsumerConfig imagesConsumerConfig;
 
@@ -64,13 +64,13 @@ public class ConfigurationSingleton {
         }
 
         topicImages = properties.getProperty(TOPIC_IMAGES_CONFIG_NAME);
-        topicHexValue = properties.getProperty(TOPIC_HEX_VALUE_CONFIG_NAME);
+        topicHexCode = properties.getProperty(TOPIC_HEX_CODE_CONFIG_NAME);
         imagesFileType = FileType.valueOf(properties.getProperty(IMAGES_FILE_TYPE_CONFIG_NAME).toUpperCase());
 
-        String cameraProducerBootstrapServerConfig = properties.getProperty(HEX_VALUE_PRODUCER_BOOTSTRAP_SERVER_CONFIG_NAME);
-        String cameraProducerSerializerClassConfig = properties.getProperty(HEX_VALUE_PRODUCER_SERIALIZER_CLASS_CONFIG_NAME);
-        String cameraProducerValueSerializerClassConfig = properties.getProperty(HEX_VALUE_PRODUCER_VALUE_SERIALIZER_CLASS_CONFIG_NAME);
-        hexValueProducerConfig = new HexGraphProducerConfig(cameraProducerBootstrapServerConfig, cameraProducerSerializerClassConfig,
+        String cameraProducerBootstrapServerConfig = properties.getProperty(HEX_CODE_PRODUCER_BOOTSTRAP_SERVER_CONFIG_NAME);
+        String cameraProducerSerializerClassConfig = properties.getProperty(HEX_CODE_PRODUCER_SERIALIZER_CLASS_CONFIG_NAME);
+        String cameraProducerValueSerializerClassConfig = properties.getProperty(HEX_CODE_PRODUCER_VALUE_SERIALIZER_CLASS_CONFIG_NAME);
+        hexCodeProducerConfig = new HexGraphProducerConfig(cameraProducerBootstrapServerConfig, cameraProducerSerializerClassConfig,
                 cameraProducerValueSerializerClassConfig);
 
         String cameraConsumerBootstrapServerConfig = properties.getProperty(IMAGES_CONSUMER_BOOTSTRAP_SERVER_CONFIG_NAME);
@@ -97,16 +97,16 @@ public class ConfigurationSingleton {
         return topicImages;
     }
 
-    public String getTopicHexValue() {
-        return topicHexValue;
+    public String getTopicHexCode() {
+        return topicHexCode;
     }
 
     public FileType getImagesFileType() {
         return imagesFileType;
     }
 
-    public HexGraphProducerConfig getHexValueProducerConfig() {
-        return hexValueProducerConfig;
+    public HexGraphProducerConfig getHexCodeProducerConfig() {
+        return hexCodeProducerConfig;
     }
 
     public HexGraphConsumerConfig getImagesConsumerConfig() {

@@ -7,11 +7,9 @@ import akka.routing.ActorRefRoutee;
 import akka.routing.BalancingRoutingLogic;
 import akka.routing.Routee;
 import akka.routing.Router;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.co.hexgraph.HexGraphInitialization;
 import nz.co.hexgraph.config.Configuration;
 import nz.co.hexgraph.consumers.ConsumerPropertiesBuilder;
-import nz.co.hexgraph.consumers.ConsumerValue;
 import nz.co.hexgraph.consumers.HexGraphConsumerConfig;
 import nz.co.hexgraph.hexcode.HexCodeProducer;
 import nz.co.hexgraph.image.ImageActor;
@@ -20,7 +18,6 @@ import nz.co.hexgraph.producer.HexGraphProducerConfig;
 import nz.co.hexgraph.producer.ProducerPropertiesBuilder;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.common.errors.WakeupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,8 +73,8 @@ public class ManagerActor extends AbstractActor {
                     HexGraphConsumerConfig imagesConsumerConfig = configuration.getImagesConsumerConfig();
                     imagesConsumer = buildImagesConsumer(imagesConsumerConfig);
 
-                    HexGraphProducerConfig hexValueProducerConfig = configuration.getHexValueProducerConfig();
-                    HexCodeProducer hexCodeProducer = buildHexValueProducer(hexValueProducerConfig);
+                    HexGraphProducerConfig hexCodeProducerConfig = configuration.getHexCodeProducerConfig();
+                    HexCodeProducer hexCodeProducer = buildHexCodeProducer(hexCodeProducerConfig);
 
                     String topicImages = configuration.getTopicImages();
                     imagesConsumer.subscribe(topicImages);
@@ -98,7 +95,7 @@ public class ManagerActor extends AbstractActor {
                             // without affecting others? This is more easier to modify.
                             router.route(new ImageActor.UpdateImagePath(imagePath), getSender());
                             router.route(new ImageActor.UpdateConfiguration(configuration), getSender());
-                            router.route(new ImageActor.UpdateHexValueProducer(hexCodeProducer), getSender());
+                            router.route(new ImageActor.UpdateHexCodeProducer(hexCodeProducer), getSender());
                             router.route(UPDATE_PIXEL_COUNTS, getSender());
                         }
 //                cameraConsumer.commitAsync();
@@ -119,16 +116,16 @@ public class ManagerActor extends AbstractActor {
         return consumerPropertiesBuilder.build();
     }
 
-    private HexCodeProducer buildHexValueProducer(HexGraphProducerConfig hexValueProducerConfig) {
-        Properties producerProperties = buildProducerProperties(hexValueProducerConfig);
+    private HexCodeProducer buildHexCodeProducer(HexGraphProducerConfig hexCodeProducerConfig) {
+        Properties producerProperties = buildProducerProperties(hexCodeProducerConfig);
         HexCodeProducer hexCodeProducer = new HexCodeProducer(producerProperties);
         return hexCodeProducer;
     }
 
-    private Properties buildProducerProperties(HexGraphProducerConfig hexValueProducerConfig) {
-        ProducerPropertiesBuilder producerPropertiesBuilder = new ProducerPropertiesBuilder(hexValueProducerConfig.getBootstrapServerConfig(),
-                hexValueProducerConfig.getSerializerClassConfig(),
-                hexValueProducerConfig.getValueSerializerClassConfig());
+    private Properties buildProducerProperties(HexGraphProducerConfig hexCodeProducerConfig) {
+        ProducerPropertiesBuilder producerPropertiesBuilder = new ProducerPropertiesBuilder(hexCodeProducerConfig.getBootstrapServerConfig(),
+                hexCodeProducerConfig.getSerializerClassConfig(),
+                hexCodeProducerConfig.getValueSerializerClassConfig());
 
         return producerPropertiesBuilder.build();
     }

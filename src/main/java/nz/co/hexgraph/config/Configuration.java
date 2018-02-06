@@ -6,11 +6,11 @@ import nz.co.hexgraph.producer.HexGraphProducerConfig;
 public interface Configuration {
     String getTopicImages();
 
-    String getTopicHexValue();
+    String getTopicHexCode();
 
     FileType getImageFileType();
 
-    HexGraphProducerConfig getHexValueProducerConfig();
+    HexGraphProducerConfig getHexCodeProducerConfig();
 
     HexGraphConsumerConfig getImagesConsumerConfig();
 

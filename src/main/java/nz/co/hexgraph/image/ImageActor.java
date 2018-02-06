@@ -19,8 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.IIOException;
 import java.awt.image.BufferedImage;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,9 +40,9 @@ public class ImageActor extends AbstractActor {
         int processors = Runtime.getRuntime().availableProcessors();
         List<Routee> routees = new ArrayList<>();
         for (int i = 0; i < processors; i++) {
-            ActorRef hexValueActor = getContext().actorOf(HexCodeActor.props(), "imageActor" + i);
-            getContext().watch(hexValueActor);
-            routees.add(new ActorRefRoutee(hexValueActor));
+            ActorRef hexCodeActor = getContext().actorOf(HexCodeActor.props(), "hexCodeActor" + i);
+            getContext().watch(hexCodeActor);
+            routees.add(new ActorRefRoutee(hexCodeActor));
         }
         router = new Router(new BalancingRoutingLogic(), routees);
     }
@@ -73,10 +71,10 @@ public class ImageActor extends AbstractActor {
         }
     }
 
-    public static class UpdateHexValueProducer {
+    public static class UpdateHexCodeProducer {
         private HexCodeProducer hexCodeProducer;
 
-        public UpdateHexValueProducer(HexCodeProducer hexCodeProducer) {
+        public UpdateHexCodeProducer(HexCodeProducer hexCodeProducer) {
             this.hexCodeProducer = hexCodeProducer;
         }
     }
@@ -86,7 +84,7 @@ public class ImageActor extends AbstractActor {
         return receiveBuilder()
                 .match(UpdateImagePath.class, r -> this.imagePath = r.imagePath)
                 .match(UpdateConfiguration.class, r -> this.configuration = r.configuration)
-                .match(UpdateHexValueProducer.class, r -> this.hexCodeProducer = r.hexCodeProducer)
+                .match(UpdateHexCodeProducer.class, r -> this.hexCodeProducer = r.hexCodeProducer)
                 .matchEquals(UPDATE_PIXEL_COUNTS, r -> {
                     FileType imageFileType = configuration.getImageFileType();
                     Reader reader = ReaderFactory.create(imageFileType);

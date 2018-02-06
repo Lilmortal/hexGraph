@@ -74,15 +74,15 @@ public class HexCodeActor extends AbstractActor {
                     int green = getGreenValue(rgb);
                     int blue = getBlueValue(rgb);
 
-                    String hexValue = String.format("#%02x%02x%02x", red, green, blue);
+                    String hexCode = String.format("#%02x%02x%02x", red, green, blue);
 
-                    LOGGER.info(hexValue);
-                    HexCodeMessage hexCodeMessage = hexCodeMessageBuilder.withHexValue(hexValue).build();
-                    byte[] hexValueBytes = new ObjectMapper().writeValueAsBytes(hexCodeMessage.getHexCodeMessageValue());
+                    LOGGER.info(hexCode);
+                    HexCodeMessage hexCodeMessage = hexCodeMessageBuilder.withHexCode(hexCode).build();
+                    byte[] hexCodeBytes = new ObjectMapper().writeValueAsBytes(hexCodeMessage.getHexCodeMessageValue());
 
-                    String hexValueTopic = configuration.getTopicHexValue();
-                    ProducerRecord<String, byte[]> hexValueProducerRecord = new ProducerRecord<>(hexValueTopic, hexCodeMessage.getImagePath(), hexValueBytes);
-                    hexCodeProducer.send(hexValueProducerRecord);
+                    String hexCodeTopic = configuration.getTopicHexCode();
+                    ProducerRecord<String, byte[]> hexCodeProducerRecord = new ProducerRecord<>(hexCodeTopic, hexCodeMessage.getImagePath(), hexCodeBytes);
+                    hexCodeProducer.send(hexCodeProducerRecord);
                 }).build();
 
     }

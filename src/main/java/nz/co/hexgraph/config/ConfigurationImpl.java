@@ -12,8 +12,8 @@ public class ConfigurationImpl implements Configuration {
     }
 
     @Override
-    public String getTopicHexValue() {
-        return configurationSingleton.getTopicHexValue();
+    public String getTopicHexCode() {
+        return configurationSingleton.getTopicHexCode();
     }
 
     @Override
@@ -22,8 +22,8 @@ public class ConfigurationImpl implements Configuration {
     }
 
     @Override
-    public HexGraphProducerConfig getHexValueProducerConfig() {
-        return configurationSingleton.getHexValueProducerConfig();
+    public HexGraphProducerConfig getHexCodeProducerConfig() {
+        return configurationSingleton.getHexCodeProducerConfig();
     }
 
     @Override
