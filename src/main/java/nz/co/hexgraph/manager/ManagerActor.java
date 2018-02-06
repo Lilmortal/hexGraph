@@ -88,7 +88,9 @@ public class ManagerActor extends AbstractActor {
                         for (ConsumerRecord<String, String> record : records) {
 //                            ConsumerValue consumerValue = new ObjectMapper().readValue(record.value(), ConsumerValue.class);
 
+                            // Removes the double quotes
                             String imagePath = record.value().replaceAll("^\"|\"$", "");
+                            
                             LOGGER.info("Image path: " + imagePath);
 
                             // TODO: Yes we send more messages meaning more delay BUT what if we want to update Configuration
