@@ -1,11 +1,12 @@
 package nz.co.hexgraph.hexcode;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public class HexCodeMessageBuilder {
     private String imagePath;
 
-    private LocalDateTime creationDate;
+    private String creationDate;
 
     private String hexValue;
 
@@ -14,7 +15,7 @@ public class HexCodeMessageBuilder {
         return this;
     }
 
-    public HexCodeMessageBuilder withCreationDate(LocalDateTime creationDate) {
+    public HexCodeMessageBuilder withCreationDate(String creationDate) {
         this.creationDate = creationDate;
         return this;
     }

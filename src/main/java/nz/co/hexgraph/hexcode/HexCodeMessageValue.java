@@ -1,18 +1,19 @@
 package nz.co.hexgraph.hexcode;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public class HexCodeMessageValue {
-    private LocalDateTime creationDate;
+    private String creationDate;
 
     private String hexValue;
 
-    public HexCodeMessageValue(LocalDateTime creationDate, String hexValue) {
+    public HexCodeMessageValue(String creationDate, String hexValue) {
         this.creationDate = creationDate;
         this.hexValue = hexValue;
     }
 
-    public LocalDateTime getCreationDate() {
+    public String getCreationDate() {
         return creationDate;
     }
 

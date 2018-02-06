@@ -13,7 +13,7 @@ public class S3Reader implements Reader {
     }
 
     @Override
-    public LocalDateTime getCreationDate(String imagePath) throws IOException {
+    public String getCreationDate(String imagePath) throws IOException {
         return null;
     }
 }

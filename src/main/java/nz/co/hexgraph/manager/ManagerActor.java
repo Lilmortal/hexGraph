@@ -72,41 +72,36 @@ public class ManagerActor extends AbstractActor {
                 .match(UpdateConfiguration.class, r -> this.configuration = r.configuration)
                 .matchEquals(MESSAGE.START, r -> {
                     ImagesConsumer imagesConsumer = null;
-                    try {
-                        HexGraphConsumerConfig imagesConsumerConfig = configuration.getImagesConsumerConfig();
-                        imagesConsumer = buildImagesConsumer(imagesConsumerConfig);
 
-                        HexGraphProducerConfig hexValueProducerConfig = configuration.getHexValueProducerConfig();
-                        HexCodeProducer hexCodeProducer = buildHexValueProducer(hexValueProducerConfig);
+                    HexGraphConsumerConfig imagesConsumerConfig = configuration.getImagesConsumerConfig();
+                    imagesConsumer = buildImagesConsumer(imagesConsumerConfig);
 
-                        String topicImages = configuration.getTopicImages();
-                        imagesConsumer.subscribe(topicImages);
+                    HexGraphProducerConfig hexValueProducerConfig = configuration.getHexValueProducerConfig();
+                    HexCodeProducer hexCodeProducer = buildHexValueProducer(hexValueProducerConfig);
 
-                        LOGGER.info(imagesConsumer.name() + " successfully subscribed to " + topicImages);
+                    String topicImages = configuration.getTopicImages();
+                    imagesConsumer.subscribe(topicImages);
 
-                        int imageConsumerPollTimeout = configuration.getImageConsumerPollTimeout();
+                    LOGGER.info(imagesConsumer.name() + " successfully subscribed to " + topicImages);
 
-                        while (true) {
-                            ConsumerRecords<String, String> records = imagesConsumer.poll(imageConsumerPollTimeout);
-                            for (ConsumerRecord<String, String> record : records) {
-                                ConsumerValue consumerValue = new ObjectMapper().readValue(record.value(), ConsumerValue.class);
+                    int imageConsumerPollTimeout = configuration.getImageConsumerPollTimeout();
 
-                                String imagePath = consumerValue.getPayload();
-                                LOGGER.debug("Image path: " + imagePath);
+                    while (true) {
+                        ConsumerRecords<String, String> records = imagesConsumer.poll(imageConsumerPollTimeout);
+                        for (ConsumerRecord<String, String> record : records) {
+//                            ConsumerValue consumerValue = new ObjectMapper().readValue(record.value(), ConsumerValue.class);
 
-                                // TODO: Yes we send more messages meaning more delay BUT what if we want to update Configuration
-                                // without affecting others? This is more easier to modify.
-                                router.route(new ImageActor.UpdateImagePath(imagePath), getSender());
-                                router.route(new ImageActor.UpdateConfiguration(configuration), getSender());
-                                router.route(new ImageActor.UpdateHexValueProducer(hexCodeProducer), getSender());
-                                router.route(UPDATE_PIXEL_COUNTS, getSender());
-                            }
-//                cameraConsumer.commitAsync();
+                            String imagePath = record.value().replaceAll("^\"|\"$", "");
+                            LOGGER.info("Image path: " + imagePath);
+
+                            // TODO: Yes we send more messages meaning more delay BUT what if we want to update Configuration
+                            // without affecting others? This is more easier to modify.
+                            router.route(new ImageActor.UpdateImagePath(imagePath), getSender());
+                            router.route(new ImageActor.UpdateConfiguration(configuration), getSender());
+                            router.route(new ImageActor.UpdateHexValueProducer(hexCodeProducer), getSender());
+                            router.route(UPDATE_PIXEL_COUNTS, getSender());
                         }
-                    } catch (WakeupException e) {
-                        LOGGER.info("Consumer has been woken up.");
-                    } finally {
-                        imagesConsumer.close();
+//                cameraConsumer.commitAsync();
                     }
                 }).build();
     }

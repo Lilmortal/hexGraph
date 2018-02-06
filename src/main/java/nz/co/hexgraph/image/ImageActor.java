@@ -17,7 +17,9 @@ import nz.co.hexgraph.reader.ReaderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.IIOException;
 import java.awt.image.BufferedImage;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,8 +91,14 @@ public class ImageActor extends AbstractActor {
                     FileType imageFileType = configuration.getImageFileType();
                     Reader reader = ReaderFactory.create(imageFileType);
 
-                    BufferedImage image = reader.getImage(imagePath);
-                    LocalDateTime imageCreationDate = reader.getCreationDate(imagePath);
+                    BufferedImage image = null;
+                    String imageCreationDate = null;
+                    try {
+                        image = reader.getImage(imagePath);
+                        imageCreationDate = reader.getCreationDate(imagePath);
+                    } catch (IIOException e) {
+                        LOGGER.error(e.getMessage());
+                    }
 
                     int imageWidth = image.getWidth();
                     int imageHeight = image.getHeight();

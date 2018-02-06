@@ -9,5 +9,5 @@ import java.time.LocalDateTime;
 public interface Reader {
     BufferedImage getImage(String imagePath) throws IOException;
 
-    LocalDateTime getCreationDate(String imagePath) throws IOException;
+    String getCreationDate(String imagePath) throws IOException;
 }

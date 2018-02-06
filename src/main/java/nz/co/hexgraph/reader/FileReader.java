@@ -20,9 +20,10 @@ public class FileReader implements Reader {
     }
 
     @Override
-    public LocalDateTime getCreationDate(String imagePath) throws IOException {
+    public String getCreationDate(String imagePath) throws IOException {
         File file = new File(imagePath);
         BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-        return attr.creationTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+//        return attr.creationTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        return attr.creationTime().toString();
     }
 }
